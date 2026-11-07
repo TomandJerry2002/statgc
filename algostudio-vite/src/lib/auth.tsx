@@ -50,7 +50,7 @@ export async function signOut() {
   if (error) console.error(error);
 }
 
-function Loader() {
+export function Loader() {
   return (
     <div role="status" aria-label="Loading" style={{ minHeight: '100vh', display: 'grid', placeItems: 'center', background: '#F6F4FF' }}>
       <style>{'@keyframes authSpin{to{transform:rotate(360deg)}}'}</style>
