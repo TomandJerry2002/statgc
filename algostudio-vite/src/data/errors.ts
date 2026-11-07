@@ -28,6 +28,12 @@ export function fail(error: PostgrestError, action: Action = 'other'): never {
   throw new DataError(messageFor(error, action), error);
 }
 
+/** Same as fail() for Storage errors (they carry no Postgres code). */
+export function failStorage(error: Error, message = GENERIC): never {
+  console.error('[storage]', error);
+  throw new DataError(message, error);
+}
+
 /** The message to show for anything a data call threw. */
 export function userMessage(e: unknown): string {
   if (e instanceof DataError) return e.message;
