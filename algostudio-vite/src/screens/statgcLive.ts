@@ -10,6 +10,7 @@ import { listDeals, listWaitingDeals, createDeal, updateDeal, previewStatus, typ
 import { listPayments, createPayment, setDisputed, setWrittenOff } from '@/data/payments';
 import { listReceipts, createReceipt, deleteReceipt, signedUrls, signedUrl, checkScreenshot } from '@/data/receipts';
 import { moneySummary, countOwedPayments } from '@/data/money';
+import { insightsSummary } from '@/data/insights';
 
 export type UIDates = { offerSent: string; reminded: string; agreed: string; declined: string; cancelled: string };
 
@@ -24,8 +25,10 @@ const toDb = (t: UIDates) => ({
 export async function loadAll() {
   const [profile, session] = await Promise.all([getMyProfile(), supabase().auth.getSession()]);
   const today = todayIn(profile?.timezone);
-  const [brands, deals, waiting, payments, receipts, money] = await Promise.all([
+  const [brands, deals, waiting, payments, receipts, money, insights] = await Promise.all([
     listBrands(), listDeals(), listWaitingDeals(), listPayments(), listReceipts(), moneySummary(today),
+    // Insights are optional: if they fail (already logged), hide the box instead of failing the app.
+    insightsSummary(today).catch(() => []),
   ]);
 
   const receiptsBy: Record<string, object[]> = {};
@@ -58,6 +61,7 @@ export async function loadAll() {
     waitingIds: waiting.map(d => d.id),
     money,
     owedCount: countOwedPayments(payments, deals),
+    insights,
   };
 }
 

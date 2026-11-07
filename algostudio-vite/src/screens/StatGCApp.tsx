@@ -159,7 +159,7 @@ class Component extends DCLogic {
   // live (only on /app): real data. Without it (the website's embedded previews) the seed demo runs and nothing calls Supabase.
   state = { ...(this.props.live ? { brands: [], deals: [] } : seed(this.props.demo || 'INR + USD')), tpls: {}, page: this.props.startPage || 'home', dealId: null, drawer: null, modal: null, toast: '', w: this.props.embedW || window.innerWidth, dealF: 'all', q: '', payF: 'all', brView: 'list', brSel: null, brF: 'all', brHold: false, game: false,
     profile: this.props.live ? { name: '', handle: '', email: '', phone: '' } : { name: 'Riya Sharma', handle: 'riya.creates', email: 'riya@riyacreates.in', phone: '+91 98765 43210' }, prefs: { cur: 'INR', terms: 15, tone: 'friendly', signoff: this.props.live ? '' : 'Riya' }, insI: 0, insP: false,
-    loading: !!this.props.live, loadErr: '', waitIds: [], money: [], owedCount: {}, profileId: null, shotUrls: {} };
+    loading: !!this.props.live, loadErr: '', waitIds: [], money: [], insights: [], owedCount: {}, profileId: null, shotUrls: {} };
 
   componentDidMount() { this._rs = () => { if (!this.props.embedW) this.setState({ w: window.innerWidth }); }; window.addEventListener('resize', this._rs); this._gc = () => this.setState({ game: false }); document.addEventListener('orbitclose', this._gc); this._ins = setInterval(() => { if (!this.state.insP && this.state.page === 'home') this.setState(s => ({ insI: s.insI + 1 })); }, 6000); if (this.props.live) this.reload(true); }
   componentWillUnmount() { window.removeEventListener('resize', this._rs); document.removeEventListener('orbitclose', this._gc); clearTimeout(this._t); clearInterval(this._ins); clearTimeout(this._pv); clearTimeout(this._nm); }
@@ -169,7 +169,7 @@ class Component extends DCLogic {
     try {
       const r = await loadAll();
       TODAY = r.today;
-      const patch = { loading: false, loadErr: '', brands: r.brands, deals: r.deals, waitIds: r.waitingIds, money: r.money, owedCount: r.owedCount, profileId: r.profileId };
+      const patch = { loading: false, loadErr: '', brands: r.brands, deals: r.deals, waitIds: r.waitingIds, money: r.money, insights: r.insights, owedCount: r.owedCount, profileId: r.profileId };
       if (first) { patch.profile = { ...this.state.profile, name: r.fullName, email: r.email }; patch.prefs = { ...this.state.prefs, signoff: r.fullName.trim().split(/\s+/)[0] || '' }; }
       this.setState(patch);
     } catch (e) {
@@ -236,6 +236,25 @@ class Component extends DCLogic {
       const [bid, cur] = top[0].split('|'), b = this.brandOf(bid), n = S.deals.filter(d => d.brandId === bid).length;
       slides.push({ big: money(cur, top[1]), head: `received from ${b.name}, your top-paying brand.`, body: `${n} deal${n > 1 ? 's' : ''} together so far. Open Brands to see how they usually pay.` });
     }
+    return { has: slides.length > 0, slides };
+  }
+  /**
+   * Insights from insights_summary, shown as returned. One slide per insight per currency:
+   * all Overdue slides first, then On time, then Top brand. A slide only appears when it has
+   * something to say, so a new account shows no box (never 0% or NaN).
+   */
+  liveInsights() {
+    const rows = this.state.insights, multi = rows.length > 1, slides = [];
+    const s = n => (n === 1 ? '' : 's'), cur = c => (multi ? ' ' + c : '');
+    rows.forEach(r => { if (r.overdue_count > 0) slides.push({
+      big: money(r.currency, r.overdue_amount), head: `overdue across ${r.overdue_count}${cur(r.currency)} payment${s(r.overdue_count)}.`,
+      body: `The oldest is ${r.oldest_overdue_brand} · ${r.oldest_overdue_label}, due ${fd(r.oldest_overdue_due_date)}. Send a payment reminder from the deal record.` }); });
+    rows.forEach(r => { if (r.on_time_percent != null) slides.push({
+      big: r.on_time_percent + '%', head: `of fully paid${cur(r.currency)} payments arrived on or before the due date.`,
+      body: `${r.on_time_count} of ${r.paid_count} payment${s(r.paid_count)} came in on time. Sending reminders from the deal record before the due date helps keep this up.` }); });
+    rows.forEach(r => { if (r.top_brand_received > 0) { const n = r.top_brand_deal_count || 0; slides.push({
+      big: money(r.currency, r.top_brand_received), head: `received from ${r.top_brand_name}, your top-paying brand${multi ? ' in ' + r.currency : ''}.`,
+      body: (n ? `${n} agreed deal${s(n)} together so far. ` : '') + 'Open Brands to see how they usually pay.' }); } });
     return { has: slides.length > 0, slides };
   }
   componentDidUpdate(prev, prevState) { if (this.props.live && this.state.drawer && (this.state.drawer !== prevState.drawer || this.state.deals !== prevState.deals)) this.loadShots(); if (prev.demo !== this.props.demo) this.setState({ ...seed(this.props.demo || 'INR + USD'), page: 'home', drawer: null, modal: null, dealF: 'all', q: '', payF: 'all', brSel: null, brF: 'all' }); }
@@ -472,7 +491,7 @@ class Component extends DCLogic {
 
     const waitingDeals = LIVE ? S.waitIds.map(id => S.deals.find(d => d.id === id)).filter(Boolean) : S.deals.filter(d => ['offer_sent', 'offer_follow_up'].includes(dealStatus(d)));
     const noBrands = !S.brands.length;
-    const ins = LIVE ? { has: false, slides: [] } : this.insights();
+    const ins = LIVE ? this.liveInsights() : this.insights();
     if (ins.has) {
       const N = ins.slides.length, i = ((S.insI % N) + N) % N, sl = ins.slides[i];
             Object.assign(ins, sl, {
