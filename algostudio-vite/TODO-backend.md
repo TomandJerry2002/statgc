@@ -32,6 +32,11 @@ Optional columns. Nothing writes them yet.
 - `deals.notes`
 - `payments.invoice_number`, `payments.invoice_sent_on`
 
-## Phase 5
+## Receipt screenshots (from Phase 5)
 
-- Receipt screenshots: upload to the private `receipts` bucket at `<user_id>/…`, save `payment_receipts.screenshot_path`, and show them with signed URLs. The picker is hidden in the live app until then.
+Done in the frontend: uploads go to `receipts/<user_id>/<uuid>.<ext>`, `screenshot_path` is saved, screenshots are shown only through signed URLs, and deleting a receipt also deletes its file.
+
+Still needs the backend:
+
+- **File type and size are only checked in the browser.** The app accepts JPG, PNG and WebP under 5 MB, but someone calling the API directly could upload anything into their own folder. Fix: a migration that sets `file_size_limit = 5242880` and `allowed_mime_types = '{image/jpeg,image/png,image/webp}'` on the `receipts` bucket.
+- **Orphan files when rows are removed by cascade.** Deleting a payment, a deal or the whole account removes receipts through `on delete cascade`. Their files stay in storage (still private, but never cleaned up). The app has no payment or deal delete today, so only account deletion can trigger this. Fix: a scheduled cleanup (an Edge Function or cron job using the Storage API) that removes objects no `payment_receipts.screenshot_path` points to.
