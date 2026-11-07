@@ -6,7 +6,6 @@ These are parts of the design that the V1 backend can't support yet. In the live
 
 | Where | What the design shows | Backend that would replace it |
 |---|---|---|
-| Home → Insights | Share of payments that arrived on time, total overdue across payments with the oldest one named, top-paying brand by money received | A per-user insights view or RPC (on-time ratio, oldest overdue payment, received per brand per currency) |
 | Brands → Orbit → "Earned" | Money received from the brand, per currency | `brand_summary` view: received per brand per currency |
 | Brands → Orbit → "Usually pays" | Average days late for fully paid payments | Same view: average of (last receipt date − due date) for fully paid payments |
 | Deal detail → payments subtitle | "₹X scheduled · ₹Y received" (the live app shows "N payments") | Add `scheduled_amount` and `received_amount` to `deals_with_status`, or a `deal_money` view |
