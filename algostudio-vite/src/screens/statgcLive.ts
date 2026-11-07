@@ -8,7 +8,7 @@ import { getMyProfile, updateFullName } from '@/data/profile';
 import { listBrands, createBrand, deleteBrand } from '@/data/brands';
 import { listDeals, listWaitingDeals, createDeal, updateDeal, previewStatus, type DealInput } from '@/data/deals';
 import { listPayments, createPayment, setDisputed, setWrittenOff } from '@/data/payments';
-import { listReceipts, createReceipt } from '@/data/receipts';
+import { listReceipts, createReceipt, deleteReceipt, signedUrls, signedUrl, checkScreenshot } from '@/data/receipts';
 import { moneySummary, countOwedPayments } from '@/data/money';
 
 export type UIDates = { offerSent: string; reminded: string; agreed: string; declined: string; cancelled: string };
@@ -30,7 +30,7 @@ export async function loadAll() {
 
   const receiptsBy: Record<string, object[]> = {};
   for (const r of receipts) {
-    (receiptsBy[r.payment_id] ??= []).push({ id: r.id, amount: r.amount_received, date: r.received_on, method: r.method ?? '', utr: r.utr ?? '', shot: null });
+    (receiptsBy[r.payment_id] ??= []).push({ id: r.id, amount: r.amount_received, date: r.received_on, method: r.method ?? '', utr: r.utr ?? '', shot: r.screenshot_path ? { path: r.screenshot_path, name: '', url: '' } : null });
   }
   const paymentsBy: Record<string, object[]> = {};
   for (const p of payments) {
@@ -73,8 +73,12 @@ export const actions = {
     updateDeal(dealId, key === 'offerSent' ? { offer_sent_on: today } : { offer_reminded_on: today }),
   addPayment: (x: { dealId: string; currency: string; label: string; amount: number; dueDate: string }) =>
     createPayment({ deal_id: x.dealId, currency: x.currency, label: x.label, amount: x.amount, due_date: x.dueDate || null }),
-  addReceipt: (x: { paymentId: string; amount: number; date: string; method: string; utr: string }) =>
-    createReceipt({ payment_id: x.paymentId, amount_received: x.amount, received_on: x.date, method: x.method || null, utr: x.utr }),
+  addReceipt: (x: { paymentId: string; amount: number; date: string; method: string; utr: string; file: File | null }) =>
+    createReceipt({ payment_id: x.paymentId, amount_received: x.amount, received_on: x.date, method: x.method || null, utr: x.utr }, x.file),
+  deleteReceipt,
+  signedUrls,
+  signedUrl,
+  checkScreenshot,
   addBrand: async (x: { name: string; phone: string; email: string }) =>
     (await createBrand({ name: x.name, phone: x.phone || null, email: x.email || null })).id,
   deleteBrand,
