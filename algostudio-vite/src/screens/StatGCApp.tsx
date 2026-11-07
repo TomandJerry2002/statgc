@@ -586,25 +586,6 @@ class Component extends DCLogic {
     };
   }
 }
-</script>
-</body>
-</html>
-]].map(([v, l]) => opt('cur', v, l)),
-      terms: [7, 15, 30, 45].map(v => opt('terms', v, v + ' days')),
-      termsHint: `New payments default to a due date ${F.terms} days after you add them, e.g. ${fd(addDays(TODAY, F.terms))} if added today.`,
-      signoff: F.signoff, onSignoff: e => setF('signoff', e.target.value),
-      tones: [['friendly', 'Friendly'], ['firm', 'Firm'], ['final', 'Final']].map(([v, l]) => opt('tone', v, l)),
-      tplText: nT ? `${nT} saved for this session` : 'None saved. Save one from any message.', noTpls: !nT, tplOp: nT ? 1 : .5,
-      resetTpls: () => { this.setState({ tpls: {} }); this.toast('Templates reset'); } };
-    const page = { home: S.page === 'home', deals: S.page === 'deals' || (S.page === 'deal' && !D), deal: S.page === 'deal' && !!D, money: S.page === 'money', brands: S.page === 'brands' };
-    return {
-      screenLabel: labels[S.page], shell: { wide, narrow: !wide, cols: wide ? '248px minmax(0,1fr)' : 'minmax(0,1fr)', pad: wide ? '32px 40px 64px' : '16px 16px 48px' },
-      nav, page, home, sums, ins, dl, dd, mo, br, ob, pd, md,
-      newDeal: () => this.openDealForm(), addBrand: () => this.openBrand(), goDeals: go('deals'),
-      hasToast: !!S.toast, toast: S.toast
-    };
-  }
-}
 
 export default class StatGCApp extends Component {
   render() {
