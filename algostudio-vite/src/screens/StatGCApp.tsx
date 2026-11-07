@@ -3,7 +3,6 @@
 import React from 'react';
 import { DCLogic, DCHost, sty, T, S, L, R, hostPos, XImport } from '@/dc/runtime';
 import { signOut, Loader } from '@/lib/auth';
-import { todayIn } from '@/lib/dates';
 import { statusLabel } from '@/data/deals';
 import { loadAll, actions } from './statgcLive';
 import { userMessage } from '@/data/errors';
@@ -48,8 +47,10 @@ button:focus-visible,input:focus-visible,select:focus-visible,[role=button]:focu
 `;
 const LINKS = ["https://fonts.googleapis.com/css2?family=Jost:wght@500;600&display=swap"];
 
-// Today's date in the user's timezone (profiles.timezone once the live app loads).
-let TODAY = todayIn();
+// The demo (website previews) keeps the date its seed data was written for.
+// Live mode on /app replaces it with todayIn(profiles.timezone) on every load.
+const DEMO_TODAY = '2026-11-04';
+let TODAY = DEMO_TODAY;
 const IC = n => `url(https://unpkg.com/lucide-static@0.460.0/icons/${n}.svg)`;
 const MON = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 const fd = s => { if (!s) return ''; const [y, m, d] = s.split('-'); return `${+d} ${MON[+m - 1]} ${y}`; };
@@ -154,6 +155,7 @@ function seed(mode) {
 }
 
 class Component extends DCLogic {
+  constructor(props) { super(props); if (!props.live) TODAY = DEMO_TODAY; }  // e.g. after navigating from /app back to the website
   // live (only on /app): real data. Without it (the website's embedded previews) the seed demo runs and nothing calls Supabase.
   state = { ...(this.props.live ? { brands: [], deals: [] } : seed(this.props.demo || 'INR + USD')), tpls: {}, page: this.props.startPage || 'home', dealId: null, drawer: null, modal: null, toast: '', w: this.props.embedW || window.innerWidth, dealF: 'all', q: '', payF: 'all', brView: 'list', brSel: null, brF: 'all', brHold: false, game: false,
     profile: this.props.live ? { name: '', handle: '', email: '', phone: '' } : { name: 'Riya Sharma', handle: 'riya.creates', email: 'riya@riyacreates.in', phone: '+91 98765 43210' }, prefs: { cur: 'INR', terms: 15, tone: 'friendly', signoff: this.props.live ? '' : 'Riya' }, insI: 0, insP: false,
