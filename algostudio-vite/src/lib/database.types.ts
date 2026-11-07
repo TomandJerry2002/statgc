@@ -349,6 +349,24 @@ export type Database = {
           status: string
         }[]
       }
+      insights_summary: {
+        Args: { p_today?: string }
+        Returns: {
+          currency: string
+          oldest_overdue_brand: string
+          oldest_overdue_due_date: string
+          oldest_overdue_label: string
+          on_time_count: number
+          on_time_percent: number
+          overdue_amount: number
+          overdue_count: number
+          paid_count: number
+          top_brand_deal_count: number
+          top_brand_id: string
+          top_brand_name: string
+          top_brand_received: number
+        }[]
+      }
       money_summary: {
         Args: { p_today?: string }
         Returns: {
