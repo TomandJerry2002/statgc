@@ -1,4 +1,4 @@
-# Browser test checklist (Phases 4 and 5)
+# Browser test checklist (Phases 4 and 5, Insights)
 
 **Setup:** in `web/algostudio-vite`, run `npm run dev` and open `http://localhost:5173`. You need two Google accounts:
 - **A** in a normal browser window
@@ -111,5 +111,14 @@ const me = (await sb.auth.getUser()).data.user.id;
 
 ### As A again
 - [ ] Delete the receipt with the trash button and confirm. The row disappears, and the file is gone from Storage → `receipts`.
+
+## 10. Insights box
+The box on Home rotates through slides every 6 seconds. Hover to pause it, or click the dots to switch slides.
+- [ ] A new account with no payments shows **no Insights box at all**: no 0%, no NaN, no empty card.
+- [ ] Add an unpaid INR payment with a due date in the past. An overdue slide appears, for example "₹X overdue across N payments". X matches the **Overdue** figure in the INR money block, and the slide names the oldest overdue payment and its brand.
+- [ ] On time vs late. Fully pay one INR payment that's due in the future (on time), and one that's due in the past (late). The on-time slide reads "50%" with "1 of 2 payments came in on time". Payments with no due date don't count.
+- [ ] Top-paying brand. Record more received from brand X than from brand Y in INR. The slide names X with the amount received from X, and its agreed-deal count.
+- [ ] Two currencies. Add received or overdue USD payments as well. Each currency gets its **own** slides, with "INR" or "USD" in the text, and amounts are never added together into one number.
+- [ ] **B** (private window) sees no Insights from A's data. B's box is absent, or shows only B's own payments.
 
 When you've run through it, note anything that failed, along with the console error if there was one.
