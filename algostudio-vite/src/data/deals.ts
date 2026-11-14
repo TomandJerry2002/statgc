@@ -1,6 +1,7 @@
 import { supabase } from '@/lib/supabase';
 import type { Database, Tables, TablesInsert } from '@/lib/database.types';
-import { fail } from './errors';
+import { DataError, fail } from './errors';
+import { removeFiles } from './receipts';
 
 /** A row of the deals_with_status view: the deal plus its derived status. */
 export type Deal = Tables<'deals_with_status'>;
@@ -60,7 +61,29 @@ export async function updateDeal(id: string, patch: DealPatch): Promise<void> {
   if (error) fail(error, 'deal.save');
 }
 
-type StatusArgs = Database['public']['Functions']['compute_deal_status']['Args'];
+/**
+ * Deletes a cancelled deal. Its payments and receipts go with it (on delete
+ * cascade); receipt screenshots are then removed from Storage. Only deals
+ * with cancelled_on set are deleted, so this can't remove an active deal.
+ */
+export async function deleteCancelledDeal(id: string): Promise<void> {
+  const db = supabase();
+  // Read the screenshot paths first: the rows are gone after the delete.
+  const { data: pays, error: pe } = await db.from('payments').select('id').eq('deal_id', id);
+  if (pe) fail(pe, 'deal.delete');
+  let paths: string[] = [];
+  if (pays.length) {
+    const { data: recs, error: re } = await db.from('payment_receipts').select('screenshot_path').in('payment_id', pays.map(p => p.id));
+    if (re) fail(re, 'deal.delete');
+    paths = recs.map(r => r.screenshot_path).filter((p): p is string => !!p);
+  }
+  const { data, error } = await db.from('deals').delete().eq('id', id).not('cancelled_on', 'is', null).select('id');
+  if (error) fail(error, 'deal.delete');
+  if (!data.length) throw new DataError('Only cancelled deals can be deleted.', null);
+  await removeFiles(paths);
+}
+
+type StatusArgs =Database['public']['Functions']['compute_deal_status']['Args'];
 export type StatusDates = { [K in DateFields]?: string | null };
 
 /**

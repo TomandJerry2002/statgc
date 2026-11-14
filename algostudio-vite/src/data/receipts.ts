@@ -74,8 +74,14 @@ export async function deleteReceipt(id: string): Promise<void> {
 
 /** Best effort: the receipt is already gone, so a failure here only leaves an unreachable file. */
 async function removeFile(path: string) {
-  const { error } = await supabase().storage.from(BUCKET).remove([path]);
-  if (error) console.error('[storage] could not delete', path, error);
+  await removeFiles([path]);
+}
+
+/** Best effort, like removeFile. Used after deleting a deal (its receipts cascade). */
+export async function removeFiles(paths: string[]) {
+  if (!paths.length) return;
+  const { error } = await supabase().storage.from(BUCKET).remove(paths);
+  if (error) console.error('[storage] could not delete', paths, error);
 }
 
 /** Short-lived signed URLs for several screenshots, keyed by path. */

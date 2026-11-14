@@ -5,12 +5,15 @@
 import { supabase } from '@/lib/supabase';
 import { todayIn } from '@/lib/dates';
 import { getMyProfile, updateFullName } from '@/data/profile';
-import { listBrands, createBrand, deleteBrand } from '@/data/brands';
-import { listDeals, listWaitingDeals, createDeal, updateDeal, previewStatus, type DealInput } from '@/data/deals';
+import { listBrands, createBrand, updateBrand, deleteBrand } from '@/data/brands';
+import { listDeals, listWaitingDeals, createDeal, updateDeal, deleteCancelledDeal, previewStatus, type DealInput } from '@/data/deals';
 import { listPayments, createPayment, setDisputed, setWrittenOff } from '@/data/payments';
 import { listReceipts, createReceipt, deleteReceipt, signedUrls, signedUrl, checkScreenshot } from '@/data/receipts';
 import { moneySummary, countOwedPayments } from '@/data/money';
 import { insightsSummary } from '@/data/insights';
+
+/** Label of the payment added when a deal's price goes up after payments exist. */
+export const BALANCE_LABEL = 'Balance after price change';
 
 export type UIDates = { offerSent: string; reminded: string; agreed: string; declined: string; cancelled: string };
 
@@ -51,7 +54,7 @@ export async function loadAll() {
     profileId: profile?.id ?? null,
     fullName: profile?.full_name ?? '',
     email: session.data.session?.user.email ?? '',
-    brands: brands.map(b => ({ id: b.id, name: b.name, phone: b.phone ?? '', email: b.email ?? '' })),
+    brands: brands.map(b => ({ id: b.id, name: b.name, phone: b.phone ?? '', email: b.email ?? '', instagram: b.instagram ?? '' })),
     deals: deals.filter(d => d.id).map(d => ({
       id: d.id!, brandId: d.brand_id, project: d.project_name ?? '', currency: d.currency ?? 'INR', amount: d.offer_amount,
       dates: { offerSent: d.offer_sent_on ?? '', reminded: d.offer_reminded_on ?? '', agreed: d.terms_agreed_on ?? '', declined: d.declined_on ?? '', cancelled: d.cancelled_on ?? '' },
@@ -66,13 +69,21 @@ export async function loadAll() {
 }
 
 export const actions = {
-  /** Creates the brand first when the name is new. Returns the deal id. */
-  async saveDeal(x: { id: string | null; brandId: string | null; brandName: string; project: string; currency: string; amount: number; dates: UIDates }) {
+  /**
+   * Creates the brand first when the name is new. Returns the deal id.
+   * balance: when an edit raises the price of a deal that already has payments,
+   * the extra amount is added as its own payment so it shows as owed everywhere.
+   */
+  async saveDeal(x: { id: string | null; brandId: string | null; brandName: string; project: string; currency: string; amount: number; dates: UIDates; balance?: number }) {
     const brandId = x.brandId ?? (await createBrand({ name: x.brandName })).id;
     const fields: DealInput = { brand_id: brandId, project_name: x.project, offer_amount: x.amount, currency: x.currency, ...toDb(x.dates) };
-    if (x.id) { await updateDeal(x.id, fields); return x.id; }
-    return createDeal(fields);
+    if (!x.id) return createDeal(fields);
+    await updateDeal(x.id, fields);
+    if (x.balance && x.balance > 0)
+      await createPayment({ deal_id: x.id, currency: x.currency, label: BALANCE_LABEL, amount: x.balance, due_date: null });
+    return x.id;
   },
+  deleteDeal: deleteCancelledDeal,
   markDate: (dealId: string, key: 'offerSent' | 'reminded', today: string) =>
     updateDeal(dealId, key === 'offerSent' ? { offer_sent_on: today } : { offer_reminded_on: today }),
   addPayment: (x: { dealId: string; currency: string; label: string; amount: number; dueDate: string }) =>
@@ -83,8 +94,10 @@ export const actions = {
   signedUrls,
   signedUrl,
   checkScreenshot,
-  addBrand: async (x: { name: string; phone: string; email: string }) =>
-    (await createBrand({ name: x.name, phone: x.phone || null, email: x.email || null })).id,
+  addBrand: async (x: { name: string; phone: string; email: string; instagram: string }) =>
+    (await createBrand({ name: x.name, phone: x.phone || null, email: x.email || null, instagram: x.instagram || null })).id,
+  /** Only the fields passed are written (see updateBrand). */
+  editBrand: (id: string, x: { name?: string; phone?: string; email?: string; instagram?: string }) => updateBrand(id, x),
   deleteBrand,
   setDisputed,
   setWrittenOff,

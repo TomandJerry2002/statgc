@@ -1,7 +1,7 @@
 import type { PostgrestError } from '@supabase/supabase-js';
 
 /** What the app was doing when the error happened. Picks the message. */
-export type Action = 'brand.delete' | 'deal.save' | 'other';
+export type Action = 'brand.delete' | 'deal.save' | 'deal.delete' | 'other';
 
 const GENERIC = 'Something went wrong. Please try again.';
 
