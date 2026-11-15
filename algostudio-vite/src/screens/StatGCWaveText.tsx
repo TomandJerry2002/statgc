@@ -26,8 +26,8 @@ class Component extends DCLogic {
   zoomRef = React.createRef(); zoomInner = React.createRef(); dotRef = React.createRef(); fillRef = React.createRef(); hintRef = React.createRef(); marqWrap = React.createRef();
   revRef = React.createRef(); braceRef = React.createRef(); braceL = React.createRef(); braceR = React.createRef(); braceW = React.createRef();
   benRef = React.createRef(); benMarq = React.createRef();
-  waveRef = React.createRef(); waveRow = React.createRef();
-  WAVE = 'How you get paid on time';
+  waveRef = React.createRef(); waveRow = React.createRef(); waveH2 = React.createRef(); waveFill = React.createRef();
+  WAVE = 'How you get paid on time.';
   waveRefs = this.WAVE.split('').map(() => React.createRef());
   rowRefs = [0, 1, 2, 3, 4].map(() => React.createRef());
   REV = 'Add a brand. Log the offer. Split it into an advance and a final payment. Record what arrives, with the UTR and a screenshot. StatGC works out where every deal stands and what you should do next.';
@@ -91,8 +91,21 @@ class Component extends DCLogic {
     // falling-letter wave
     const wr = this.waveRow.current, ws = this.waveRef.current;
     if (wr && ws) {
-      if (!this._wx || this._wvw !== vw) { wr.style.transform = 'none'; this._wvw = vw; this._wx = this.waveRefs.map(r => r.current ? r.current.offsetLeft + r.current.offsetWidth / 2 : 0); this._ww = wr.scrollWidth; }
-      const p = still ? 1 : Math.min(1, this.prog(ws) / .88), tx = -p * Math.max(0, this._ww - vw * .42);
+      const h2 = this.waveH2.current, fl = this.waveFill.current, dotEl = this.waveRefs[this.waveRefs.length - 1].current;
+      if (!this._wx || this._wvw !== vw) {
+        wr.style.transform = 'none'; if (h2) h2.style.transform = 'none'; this.waveRefs.forEach(r => { if (r.current) r.current.style.transform = 'none'; });
+        this._wvw = vw; this._wx = this.waveRefs.map(r => r.current ? r.current.offsetLeft + r.current.offsetWidth / 2 : 0); this._ww = wr.scrollWidth;
+        if (dotEl && h2) { const dr = dotEl.getBoundingClientRect(), hr = h2.getBoundingClientRect(); this._dot = { x: dr.left + dr.width / 2 - hr.left, y: dr.top + dr.height / 2 - hr.top, d: Math.max(4, dr.width) }; }
+      }
+      const P = still ? 0 : this.prog(ws), D = this._dot || { x: this._ww, y: 0, d: 20 };
+      const p = still ? 1 : cl(P / .85), tx = -p * Math.max(0, D.x - vw * .5);
+      const z = 0;
+      if (h2) {
+        const sMax = Math.hypot(vw, vh) * 2.4 / D.d, s = z > 0 ? Math.pow(sMax, z * z * (3 - 2 * z) * .35 + z * .65) : 1;
+        h2.style.transformOrigin = `${(D.x + tx).toFixed(1)}px ${D.y.toFixed(1)}px`;
+        h2.style.transform = s > 1 ? `scale(${s.toFixed(4)})` : 'none';
+      }
+      if (fl) fl.style.opacity = cl((z - .86) / .1).toFixed(3);
       wr.style.transform = `translateX(${Math.round(tx)}px)`;
       const fs = parseFloat(getComputedStyle(wr).fontSize) || 300, edge = vw * .5, span = vw * .55;
       this.waveRefs.forEach((r, i) => {
@@ -119,8 +132,8 @@ class Component extends DCLogic {
       zoomRef: this.zoomRef, zoomInner: this.zoomInner, dotRef: this.dotRef, fillRef: this.fillRef, hintRef: this.hintRef, marqWrap: this.marqWrap,
       revRef: this.revRef, braceRef: this.braceRef, braceL: this.braceL, braceR: this.braceR, braceW: this.braceW, benRef: this.benRef, benMarq: this.benMarq,
       navD: m ? 'none' : 'block',
-      waveRef: this.waveRef, waveRow: this.waveRow, waveH: still ? '100vh' : '420vh', waveFs: m ? '42vw' : 'min(46vh,30vw)',
-      waveChars: this.WAVE.split('').map((ch, i) => ({ ch, ref: this.waveRefs[i] })),
+      waveRef: this.waveRef, waveRow: this.waveRow, waveH2: this.waveH2, waveFill: this.waveFill, waveH: still ? '100vh' : '460vh', waveFs: m ? '42vw' : 'min(46vh,30vw)',
+      waveChars: this.WAVE.split('').map((ch, i, a) => ({ ch, ref: this.waveRefs[i], dot: i === a.length - 1, txt: i !== a.length - 1 })),
       zoomH: still ? '100vh' : '300vh', revH: still ? 'auto' : '200vh',
       marqRows: this.rowRefs.map(ref => ({ ref })),
       revWords: this.REV.split(' ').map((t, i) => ({ t, ref: this.revRefs[i] })),
@@ -144,7 +157,7 @@ export default class StatGCWaveText extends Component {
     const v = { ...this.props, ...(this.renderVals() || {}) };
     return (
       <DCHost id="StatGCWaveText" css={CSS} links={LINKS} hostStyle={this.props.__hostStyle}>
-        <div style={{"position":"relative","background":"#07060F"}}><section ref={v.waveRef} data-screen-label="How you get paid" style={sty(`position:relative;height:${S(v.waveH)};background:#07060F`)}>{"\n  "}<div style={{"position":"sticky","top":"0","height":"100vh","overflow":"hidden","display":"flex","alignItems":"center"}}>{"\n    "}<h2 aria-label="How you get paid on time" style={sty(`margin:0;font-family:'Bricolage Grotesque',sans-serif;font-weight:500;font-size:${S(v.waveFs)};line-height:1;letter-spacing:-.03em;color:#F0BE5E;white-space:nowrap`)}>{"\n      "}<span ref={v.waveRow} aria-hidden="true" style={{"display":"inline-flex","alignItems":"baseline","paddingLeft":"4vw"}}>{L(v.waveChars).map(($it1, $i1) => { const v1 = { ...v, wc: $it1, $index: $i1 }; return (<React.Fragment key={$i1}><span ref={v1.wc?.ref} style={{"display":"inline-block","whiteSpace":"pre"}}>{T(v1.wc?.ch)}</span></React.Fragment>); })}</span>{"\n    "}</h2>{"\n  "}</div></section></div>
+        <div style={{"position":"relative","background":"#07060F"}}><section ref={v.waveRef} data-screen-label="How you get paid" style={sty(`position:relative;height:${S(v.waveH)};background:#07060F`)}>{"\n  "}<div style={{"position":"sticky","top":"0","height":"100vh","overflow":"hidden","display":"flex","alignItems":"center"}}>{"\n    "}<h2 ref={v.waveH2} aria-label="How you get paid on time." style={sty(`margin:0;will-change:transform;font-family:'Bricolage Grotesque',sans-serif;font-weight:500;font-size:${S(v.waveFs)};line-height:1;letter-spacing:-.03em;color:#F0BE5E;white-space:nowrap`)}>{"\n      "}<span ref={v.waveRow} aria-hidden="true" style={{"display":"inline-flex","alignItems":"baseline","paddingLeft":"4vw"}}>{L(v.waveChars).map(($it1, $i1) => { const v1 = { ...v, wc: $it1, $index: $i1 }; return (<React.Fragment key={$i1}>{(v1.wc?.txt) ? (<><span ref={v1.wc?.ref} style={{"display":"inline-block","whiteSpace":"pre"}}>{T(v1.wc?.ch)}</span></>) : null}{(v1.wc?.dot) ? (<><span ref={v1.wc?.ref} style={{"display":"inline-block","width":".17em","height":".17em","borderRadius":"50%","background":"#F0BE5E","marginLeft":".05em"}}></span></>) : null}</React.Fragment>); })}</span>{"\n    "}</h2>{"\n    "}<div ref={v.waveFill} aria-hidden="true" style={{"position":"absolute","inset":"0","background":"#F0BE5E","opacity":"0","pointerEvents":"none"}}></div>{"\n  "}</div></section></div>
       </DCHost>
     );
   }

@@ -14,6 +14,7 @@ npm run typecheck  # optional; not part of the build
 Main site:
 - `/`: StatGC website (from `StatGC Website.dc.html`). "Log in" opens the login over the page; the "Inside the app" preview embeds the app
 - `/login`: StatGC login on its own page (from `StatGC Website Login.dc.html`). A successful login opens `/app` (demo code 482 913)
+- `/close-up`: StatGC close-up page with the scroll zoom, word reveal and falling-letter text (from `StatGC Close-up.dc.html`)
 - `/app`: StatGC app: Home, Deals, Money, Brands with Orbit view and Orbit Catch, Settings (from `AlgoStudio V1.dc.html`)
 
 Other screens:
@@ -22,7 +23,7 @@ Other screens:
 - `/brand`: the brand's view
 - `/d/:token`, `/a/:token`: working brand links on the localStorage API (Tailwind styled)
 
-The main screens are `src/screens/StatGCWebsite.tsx`, `StatGCWebsiteLogin.tsx` and `StatGCApp.tsx`. `<orbit-catch>` is a web component in `src/vendor/orbit-catch.js`, wrapped for React in `src/dc/OrbitCatch.tsx`.
+The main screens are `src/screens/StatGCWebsite.tsx`, `StatGCWebsiteLogin.tsx` and `StatGCApp.tsx`. The website pulls in `StatGCHero.tsx`, `StatGCZoomReveal.tsx` and `StatGCWaveText.tsx`. `<orbit-catch>` is a web component in `src/vendor/orbit-catch.js`, wrapped for React in `src/dc/OrbitCatch.tsx`.
 
 ## How the screens were made
 

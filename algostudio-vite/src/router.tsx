@@ -24,6 +24,7 @@ export const router = createBrowserRouter([
   { path: '/', element: screen(() => import('./screens/StatGCWebsite')) },
   { path: '/login', element: screen(() => import('./screens/StatGCWebsiteLogin')) },
   { path: '/app', element: <RequireSession>{screen(() => import('./screens/StatGCApp'), { live: true })}</RequireSession> },
+  { path: '/close-up', element: screen(() => import('./screens/StatGCCloseUp')) },
   // Earlier AlgoStudio screens, kept for reference
   { path: '/legacy', element: screen(() => import('./screens/Website')) },
   { path: '/legacy/app', element: screen(() => import('./screens/DesktopApp')) },
