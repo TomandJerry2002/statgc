@@ -15,7 +15,8 @@ Main site:
 - `/`: StatGC website (from `StatGC Website.dc.html`). "Log in" opens the login over the page; the "Inside the app" preview embeds the app
 - `/login`: StatGC login on its own page (from `StatGC Website Login.dc.html`). A successful login opens `/app` (demo code 482 913)
 - `/close-up`: StatGC close-up page with the scroll zoom, word reveal and falling-letter text (from `StatGC Close-up.dc.html`)
-- `/app`: StatGC app: Home, Deals, Money, Brands with Orbit view and Orbit Catch, Settings (from `AlgoStudio V1.dc.html`)
+- `/app`: StatGC app: Home, Deals, Money, Brands with Orbit view and Orbit Catch, Settings (from `AlgoStudio V1.dc.html`). "Invoices" in the sidebar opens `/invoice`
+- `/invoice`: Invoice Generator: brand details, line items, deposit/discount, payment methods, PDF download and email to brand (from `Invoice Generator.dc.html`). Drafts save in localStorage
 
 Other screens:
 - `/legacy`, `/legacy/app`: the earlier AlgoStudio website and desktop app
