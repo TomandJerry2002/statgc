@@ -13,9 +13,13 @@ npm run typecheck  # optional; not part of the build
 
 Main site:
 - `/`: StatGC website (from `StatGC Website.dc.html`). "Log in" opens the login over the page; the "Inside the app" preview embeds the app
-- `/login`: StatGC login on its own page (from `StatGC Website Login.dc.html`). A successful login opens `/app` (demo code 482 913)
+- `/login`: StatGC login on its own page (from `StatGC Website Login.dc.html`). Google sign-in; afterwards phones open `/mobile` and computers open `/app`
 - `/close-up`: StatGC close-up page with the scroll zoom, word reveal and falling-letter text (from `StatGC Close-up.dc.html`)
 - `/app`: StatGC app: Home, Deals, Money, Brands with Orbit view and Orbit Catch, Settings (from `AlgoStudio V1.dc.html`). "Invoices" in the sidebar opens `/invoice`
+- `/app/new`: the app as a brand-new creator sees it: empty states with animated pictures, progress chart with confetti, icons-only sidebar (from `AlgoStudio V1 Empty.dc.html`)
+- `/mobile`: StatGC mobile app on live data (from `StatGC Mobile.dc.html`): Home/Deals/Money/Brands with a bottom tab bar and centre + button, new-deal sheet, deal and brand pages, reminders, 4-step invoice with PDF, settings. Needs Google sign-in and uses the same account data as `/app` (see `src/screens/mobileLive.ts`). On a phone, `/app` opens `/mobile` (add `?desktop` to keep the desktop app)
+- `/mobile/flow`: the website inside a phone frame, through login into the mobile dashboard
+- `/mobile/redesign`: the two mobile directions (1a final, 1b) side by side
 - `/invoice`: Invoice Generator: brand details, line items, deposit/discount, payment methods, PDF download and email to brand (from `Invoice Generator.dc.html`). Drafts save in localStorage
 
 Other screens:

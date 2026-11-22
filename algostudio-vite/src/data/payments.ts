@@ -13,10 +13,20 @@ export async function listPayments(): Promise<Payment[]> {
   return data;
 }
 
-/** Always pass the deal's currency: payments.currency defaults to INR on its own. */
-export async function createPayment(input: PaymentInput): Promise<void> {
+/** Always pass the deal's currency: payments.currency defaults to INR on its own. Returns the new payment's id. */
+export async function createPayment(input: PaymentInput): Promise<string> {
   const row: PaymentInput = { deal_id: input.deal_id, label: input.label, amount: input.amount, currency: input.currency, due_date: input.due_date ?? null };
-  const { error } = await supabase().from('payments').insert(row);
+  const { data, error } = await supabase().from('payments').insert(row).select('id').single();
+  if (error) fail(error);
+  return data.id;
+}
+
+/** Changes a payment's label and/or due date. Only the fields passed are written. */
+export async function updatePayment(id: string, patch: { label?: string; due_date?: string | null }): Promise<void> {
+  const row: { label?: string; due_date?: string | null } = {};
+  if (patch.label !== undefined) row.label = patch.label;
+  if (patch.due_date !== undefined) row.due_date = patch.due_date;
+  const { error } = await supabase().from('payments').update(row).eq('id', id);
   if (error) fail(error);
 }
 

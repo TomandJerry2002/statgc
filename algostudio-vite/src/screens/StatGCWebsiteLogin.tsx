@@ -3,6 +3,7 @@
 import React from 'react';
 import { DCLogic, DCHost, sty, T, S, L, R, hostPos, XImport } from '@/dc/runtime';
 import { supabase } from '@/lib/supabase';
+import { appHome } from '@/lib/auth';
 
 
 const CSS = `
@@ -27,6 +28,7 @@ input::placeholder{color:#9A97AB}
 @keyframes lgFill{from{transform:scaleX(0)}to{transform:scaleX(1)}}
 @keyframes lgSpin{to{transform:rotate(360deg)}}
 @media (prefers-reduced-motion: reduce){*{animation-duration:.01ms !important;animation-iteration-count:1 !important;transition-duration:.01ms !important}}
+html,body{scrollbar-width:none;-ms-overflow-style:none}html::-webkit-scrollbar,body::-webkit-scrollbar{display:none;width:0;height:0}
 
 .p-statgcwebsitelogin-0:hover{background:#EEEDF3 !important;color:#15122B !important}
 .p-statgcwebsitelogin-1:hover{filter:brightness(1.08) !important}
@@ -43,7 +45,7 @@ class Component extends DCLogic {
     this._rs = () => this.setState({ wide: window.innerWidth >= 960 });
     this._rs(); window.addEventListener('resize', this._rs);
     // Already signed in: skip the login card.
-    try { supabase().auth.getSession().then(({ data }) => { if (data.session) window.location.replace('/app'); }).catch(e => console.error(e)); }
+    try { supabase().auth.getSession().then(({ data }) => { if (data.session) window.location.replace(appHome()); }).catch(e => console.error(e)); }
     catch (e) { console.error(e); }
   }
   componentWillUnmount() { window.removeEventListener('resize', this._rs); clearTimeout(this._t); }

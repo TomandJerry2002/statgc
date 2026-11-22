@@ -44,6 +44,20 @@ export function RequireSession({ children }: { children: ReactNode }) {
   return <>{children}</>;
 }
 
+/** Where a signed-in user's app lives: the mobile app on phones, the desktop app otherwise. */
+export function appHome(): '/mobile' | '/app' {
+  return typeof window !== 'undefined' && window.innerWidth < 640 ? '/mobile' : '/app';
+}
+
+/** On a phone, /app opens the mobile app instead. Add ?desktop to the URL to keep the desktop app. */
+export function PhoneToMobile({ children }: { children: ReactNode }) {
+  const navigate = useNavigate();
+  const toMobile = appHome() === '/mobile' && !new URLSearchParams(window.location.search).has('desktop');
+  useEffect(() => { if (toMobile) navigate('/mobile', { replace: true }); }, [toMobile, navigate]);
+  if (toMobile) return <Loader />;
+  return <>{children}</>;
+}
+
 /** Signs out; RequireSession then sends the user to /login. */
 export async function signOut() {
   const { error } = await supabase().auth.signOut();

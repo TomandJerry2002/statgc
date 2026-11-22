@@ -3,7 +3,7 @@ import { createBrowserRouter } from 'react-router-dom';
 import { registerExternal } from './dc/runtime';
 import { DeviceOrFullscreen } from './dc/AndroidChromeDevice';
 import { OrbitCatch } from './dc/OrbitCatch';
-import { RequireSession } from './lib/auth';
+import { RequireSession, PhoneToMobile } from './lib/auth';
 
 registerExternal('AndroidChromeDevice', DeviceOrFullscreen);
 registerExternal('AndroidDevice', DeviceOrFullscreen);
@@ -23,8 +23,13 @@ export const router = createBrowserRouter([
   // Main StatGC site
   { path: '/', element: screen(() => import('./screens/StatGCWebsite')) },
   { path: '/login', element: screen(() => import('./screens/StatGCWebsiteLogin')) },
-  { path: '/app', element: <RequireSession>{screen(() => import('./screens/StatGCApp'), { live: true })}</RequireSession> },
+  { path: '/app', element: <RequireSession><PhoneToMobile>{screen(() => import('./screens/StatGCApp'), { live: true })}</PhoneToMobile></RequireSession> },
   { path: '/invoice', element: <RequireSession>{screen(() => import('./screens/InvoiceGenerator'), { live: true })}</RequireSession> },
+  { path: '/app/new', element: screen(() => import('./screens/StatGCAppEmpty')) },
+  // Mobile app on live data (Google sign-in). Phones opening /app land here.
+  { path: '/mobile', element: <RequireSession>{screen(() => import('./screens/StatGCMobile'), { live: true })}</RequireSession> },
+  { path: '/mobile/flow', element: screen(() => import('./screens/StatGCMobileFlow')) },
+  { path: '/mobile/redesign', element: screen(() => import('./screens/MobileRedesign')) },
   { path: '/close-up', element: screen(() => import('./screens/StatGCCloseUp')) },
   // Earlier AlgoStudio screens, kept for reference
   { path: '/legacy', element: screen(() => import('./screens/Website')) },

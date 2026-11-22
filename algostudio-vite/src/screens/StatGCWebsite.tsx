@@ -11,6 +11,7 @@ import StatGCWebsiteLogin from './StatGCWebsiteLogin';
 const CSS = `
 @font-face{font-family:'Satoshi';src:url('/assets/Satoshi-Variable.woff2') format('woff2');font-weight:300 900;font-style:normal;font-display:swap}
 html{scroll-behavior:smooth;scroll-padding-top:96px}html,body{margin:0;padding:0;background:#FFFFFF}@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+html,body{scrollbar-width:none;-ms-overflow-style:none}html::-webkit-scrollbar,body::-webkit-scrollbar{display:none;width:0;height:0}
 body{font-family:'Satoshi',ui-sans-serif,system-ui,sans-serif;color:#2E2E33;-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums}
 a{color:#5A43B5;text-decoration:none}
 a:hover{color:#4A35A8}
@@ -840,7 +841,7 @@ class Component extends DCLogic {
         span: 'span ' + spans[i], minH: i === 0 || i === 1 ? '440px' : '400px',
         shadow: h ? '0 16px 40px rgba(17,17,17,.08)' : '0 1px 2px rgba(17,17,17,.04)',
         lift: h && !this.state.still ? 'translateY(-4px)' : 'none',
-        wash: washes[i], washOp: h || o ? 1 : 0.45,
+        wash: 'none', washOp: 0,
         visT: h && !this.state.still ? 'translateY(-8px) scale(1.03)' : 'none',
         panelT: o ? 'translateY(0)' : 'translateY(101%)',
         btnBg: h || o ? '#6D55C9' : '#F1EDFF', btnFg: h || o ? '#FFFFFF' : '#6D55C9',
