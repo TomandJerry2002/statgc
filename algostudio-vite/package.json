@@ -1,11 +1,11 @@
 {
-  "name": "statgc",
+  "name": "flowgc",
   "private": true,
   "version": "0.1.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build && node scripts/prerender.mjs",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
     "gen:types": "npx supabase@latest gen types typescript --project-id jlbwbznlyamlkmyxhnpe --schema public > src/lib/database.types.ts"

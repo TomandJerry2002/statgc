@@ -1,4 +1,4 @@
-// React wrapper for the <orbit-catch> web component used on the StatGC app's Brands → Orbit view.
+// React wrapper for the <orbit-catch> web component used on the FlowGC app's Brands → Orbit view.
 import { createElement, useEffect, useRef } from 'react';
 import '../vendor/orbit-catch.js';
 

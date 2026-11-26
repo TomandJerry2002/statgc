@@ -1,5 +1,5 @@
 // @ts-nocheck
-// Generated from "StatGC Wave Text.dc.html" by scripts/dc-convert.js. Inline styles and logic are kept as in the prototype so it renders the same.
+// Generated from "FlowGC Wave Text.dc.html" by scripts/dc-convert.js. Inline styles and logic are kept as in the prototype so it renders the same.
 import React from 'react';
 import { DCLogic, DCHost, sty, T, S, L, R, hostPos, XImport } from '@/dc/runtime';
 
@@ -30,7 +30,7 @@ class Component extends DCLogic {
   WAVE = 'How you get paid on time.';
   waveRefs = this.WAVE.split('').map(() => React.createRef());
   rowRefs = [0, 1, 2, 3, 4].map(() => React.createRef());
-  REV = 'Add a brand. Log the offer. Split it into an advance and a final payment. Record what arrives, with the UTR and a screenshot. StatGC works out where every deal stands and what you should do next.';
+  REV = 'Add a brand. Log the offer. Split it into an advance and a final payment. Record what arrives, with the UTR and a screenshot. FlowGC works out where every deal stands and what you should do next.';
   revRefs = this.REV.split(' ').map(() => React.createRef());
   componentDidMount() {
     this._resize = () => { const m = window.innerWidth < 760; if (m !== this.state.m) this.setState({ m }); this._origin = null; this._wx = null; };
@@ -98,7 +98,7 @@ class Component extends DCLogic {
         if (dotEl && h2) { const dr = dotEl.getBoundingClientRect(), hr = h2.getBoundingClientRect(); this._dot = { x: dr.left + dr.width / 2 - hr.left, y: dr.top + dr.height / 2 - hr.top, d: Math.max(4, dr.width) }; }
       }
       const P = still ? 0 : this.prog(ws), D = this._dot || { x: this._ww, y: 0, d: 20 };
-      const p = still ? 1 : cl(P / .85), tx = -p * Math.max(0, D.x - vw * .5);
+      const p = still ? 1 : cl(P / .92), tx = still ? -Math.max(0, D.x - vw * .5) : -p * (D.x + D.d + vw * .08);
       const z = 0;
       if (h2) {
         const sMax = Math.hypot(vw, vh) * 2.4 / D.d, s = z > 0 ? Math.pow(sMax, z * z * (3 - 2 * z) * .35 + z * .65) : 1;
@@ -152,11 +152,11 @@ class Component extends DCLogic {
   }
 }
 
-export default class StatGCWaveText extends Component {
+export default class FlowGCWaveText extends Component {
   render() {
     const v = { ...this.props, ...(this.renderVals() || {}) };
     return (
-      <DCHost id="StatGCWaveText" css={CSS} links={LINKS} hostStyle={this.props.__hostStyle}>
+      <DCHost id="FlowGCWaveText" css={CSS} links={LINKS} hostStyle={this.props.__hostStyle}>
         <div style={{"position":"relative","background":"#07060F"}}><section ref={v.waveRef} data-screen-label="How you get paid" style={sty(`position:relative;height:${S(v.waveH)};background:#07060F`)}>{"\n  "}<div style={{"position":"sticky","top":"0","height":"100vh","overflow":"hidden","display":"flex","alignItems":"center"}}>{"\n    "}<h2 ref={v.waveH2} aria-label="How you get paid on time." style={sty(`margin:0;will-change:transform;font-family:'Bricolage Grotesque',sans-serif;font-weight:500;font-size:${S(v.waveFs)};line-height:1;letter-spacing:-.03em;color:#F0BE5E;white-space:nowrap`)}>{"\n      "}<span ref={v.waveRow} aria-hidden="true" style={{"display":"inline-flex","alignItems":"baseline","paddingLeft":"4vw"}}>{L(v.waveChars).map(($it1, $i1) => { const v1 = { ...v, wc: $it1, $index: $i1 }; return (<React.Fragment key={$i1}>{(v1.wc?.txt) ? (<><span ref={v1.wc?.ref} style={{"display":"inline-block","whiteSpace":"pre"}}>{T(v1.wc?.ch)}</span></>) : null}{(v1.wc?.dot) ? (<><span ref={v1.wc?.ref} style={{"display":"inline-block","width":".17em","height":".17em","borderRadius":"50%","background":"#F0BE5E","marginLeft":".05em"}}></span></>) : null}</React.Fragment>); })}</span>{"\n    "}</h2>{"\n    "}<div ref={v.waveFill} aria-hidden="true" style={{"position":"absolute","inset":"0","background":"#F0BE5E","opacity":"0","pointerEvents":"none"}}></div>{"\n  "}</div></section></div>
       </DCHost>
     );

@@ -1,5 +1,5 @@
-// Live data for StatGCMobile (/mobile). Uses the same data layer as /app
-// (statgcLive), mapped into the mobile app's simple deal shape:
+// Live data for FlowGCMobile (/mobile). Uses the same data layer as the desktop app
+// (flowgcLive), mapped into the mobile app's simple deal shape:
 //   { id, brand, project, amount, cur, due, status: 'progress' | 'invoiced' | 'paid', paidOn }
 //
 // How the mobile stages map onto the backend (no schema changes):
@@ -9,7 +9,7 @@
 // - Not invoiced: anything else. A deal with no payments yet has no due date.
 // - due: the earliest due date among the deal's open payments.
 // Declined and cancelled deals stay on the desktop app only.
-import { loadAll, actions } from './statgcLive';
+import { loadAll, actions } from './flowgcLive';
 import { updateDeal } from '@/data/deals';
 import { createPayment, updatePayment } from '@/data/payments';
 
@@ -57,7 +57,8 @@ export const mobileActions = {
   async createDeal(x: { brandId: string | null; brand: string; project: string; amount: number; cur: string; due: string; status: string }, today: string) {
     const id = await actions.saveDeal({
       id: null, brandId: x.brandId, brandName: x.brand, project: x.project, currency: x.cur, amount: x.amount,
-      dates: { offerSent: '', reminded: '', agreed: today, declined: '', cancelled: '' },
+      dates: { offerSent: '', reminded: '', agreed: today, delivered: '', invoiced: '', declined: '', cancelled: '' },
+      terms: { usage: '', usageEnd: '', rev: 2, hooks: 1 },
     });
     await createPayment({ deal_id: id, currency: x.cur, label: x.status === 'invoiced' ? INVOICE : PAYMENT, amount: x.amount, due_date: x.due || null });
   },

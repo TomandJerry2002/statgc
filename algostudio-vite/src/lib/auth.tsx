@@ -1,6 +1,7 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from './supabase';
+import { DASH } from './hosts';
 
 type Status = 'loading' | 'in' | 'out';
 
@@ -44,12 +45,12 @@ export function RequireSession({ children }: { children: ReactNode }) {
   return <>{children}</>;
 }
 
-/** Where a signed-in user's app lives: the mobile app on phones, the desktop app otherwise. */
-export function appHome(): '/mobile' | '/app' {
-  return typeof window !== 'undefined' && window.innerWidth < 640 ? '/mobile' : '/app';
+/** Where a signed-in user's app lives on the app host: the mobile app on phones, the desktop app otherwise. */
+export function appHome(): string {
+  return typeof window !== 'undefined' && window.innerWidth < 640 ? '/mobile' : DASH;
 }
 
-/** On a phone, /app opens the mobile app instead. Add ?desktop to the URL to keep the desktop app. */
+/** On a phone, the dashboard opens the mobile app instead. Add ?desktop to the URL to keep the desktop app. */
 export function PhoneToMobile({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
   const toMobile = appHome() === '/mobile' && !new URLSearchParams(window.location.search).has('desktop');

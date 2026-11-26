@@ -1,9 +1,10 @@
-import { lazy, Suspense, type ComponentType } from 'react';
+import { lazy, Suspense, type ComponentType, type ReactNode } from 'react';
 import { createBrowserRouter } from 'react-router-dom';
 import { registerExternal } from './dc/runtime';
 import { DeviceOrFullscreen } from './dc/AndroidChromeDevice';
 import { OrbitCatch } from './dc/OrbitCatch';
 import { RequireSession, PhoneToMobile } from './lib/auth';
+import { SITE_ORIGIN, APP_ORIGIN, onApp, split } from './lib/hosts';
 
 registerExternal('AndroidChromeDevice', DeviceOrFullscreen);
 registerExternal('AndroidDevice', DeviceOrFullscreen);
@@ -19,26 +20,82 @@ const page = (load: () => Promise<{ default: ComponentType<any> }>) => {
   return <Suspense fallback={null}><C /></Suspense>;
 };
 
-export const router = createBrowserRouter([
-  // Main StatGC site
-  { path: '/', element: screen(() => import('./screens/StatGCWebsite')) },
-  { path: '/login', element: screen(() => import('./screens/StatGCWebsiteLogin')) },
-  { path: '/app', element: <RequireSession><PhoneToMobile>{screen(() => import('./screens/StatGCApp'), { live: true })}</PhoneToMobile></RequireSession> },
-  { path: '/invoice', element: <RequireSession>{screen(() => import('./screens/InvoiceGenerator'), { live: true })}</RequireSession> },
-  { path: '/app/new', element: screen(() => import('./screens/StatGCAppEmpty')) },
-  // Mobile app on live data (Google sign-in). Phones opening /app land here.
-  { path: '/mobile', element: <RequireSession>{screen(() => import('./screens/StatGCMobile'), { live: true })}</RequireSession> },
-  { path: '/mobile/flow', element: screen(() => import('./screens/StatGCMobileFlow')) },
+// Hard redirect to the other host, keeping the query string and hash.
+function Away({ to }: { to: string | (() => string) }) {
+  location.replace((typeof to === 'function' ? to() : to) + location.search + location.hash);
+  return null;
+}
+const toApp = (path: string) => <Away to={APP_ORIGIN + path} />;
+
+if (onApp) {
+  const m = document.createElement('meta');
+  m.name = 'robots'; m.content = 'noindex';
+  document.head.appendChild(m);
+}
+
+// Live screens (real data, Google sign-in). Phones opening the dashboard land on /mobile.
+const live = (el: ReactNode) => <RequireSession>{el}</RequireSession>;
+const dashboard = (urlBase: string) =>
+  live(<PhoneToMobile>{screen(() => import('./screens/FlowGCApp'), { live: true, urlBase })}</PhoneToMobile>);
+const invoice = () => live(screen(() => import('./screens/InvoiceGenerator'), { live: true }));
+const mobile = () => live(screen(() => import('./screens/FlowGCMobile'), { live: true }));
+
+const brandLinks = [
+  { path: '/d/:token', element: page(() => import('./pages/brand/TermsLink')) },
+  { path: '/a/:token', element: page(() => import('./pages/brand/ApprovalLink')) },
+];
+
+// app.flowgc.co: / home, /deals, /deals/:id, /money, /brands, /settings, /login, /mobile, /new
+const appRoutes = [
+  { path: '/login', element: screen(() => import('./screens/FlowGCWebsiteLogin')) },
+  { path: '/new/*', element: screen(() => import('./screens/FlowGCAppEmpty'), { urlBase: '/new' }) },
+  { path: '/invoice', element: invoice() },
+  { path: '/mobile', element: mobile() },
+  ...brandLinks,
+  { path: '/app/*', element: <AppPathFix /> },
+  { path: '/privacy', element: <Away to={SITE_ORIGIN + '/privacy'} /> },
+  { path: '/terms', element: <Away to={SITE_ORIGIN + '/terms'} /> },
+  { path: '/data', element: <Away to={SITE_ORIGIN + '/data'} /> },
+  { path: '/*', element: dashboard('') },
+];
+// Old /app/... links on the app host drop the prefix.
+function AppPathFix() {
+  history.replaceState(null, '', location.pathname.replace(/^\/app/, '') || '/');
+  location.reload();
+  return null;
+}
+
+// flowgc.co: website and legal pages. On split domains, app paths hand off to the app host.
+const siteRoutes = [
+  { path: '/', element: screen(() => import('./screens/FlowGCWebsite')) },
+  { path: '/privacy', element: screen(() => import('./screens/FlowGCPrivacy')) },
+  { path: '/terms', element: screen(() => import('./screens/FlowGCTerms')) },
+  { path: '/data', element: screen(() => import('./screens/FlowGCDataCollection')) },
+  { path: '/close-up', element: screen(() => import('./screens/FlowGCCloseUp')) },
+  ...(split ? [
+    { path: '/login', element: toApp('/login') },
+    { path: '/app/*', element: <Away to={() => APP_ORIGIN + (location.pathname.replace(/^\/app/, '') || '/')} /> },
+    { path: '/invoice', element: toApp('/invoice') },
+    { path: '/mobile', element: toApp('/mobile') },
+    { path: '/d/:token', element: <Away to={() => APP_ORIGIN + location.pathname} /> },
+    { path: '/a/:token', element: <Away to={() => APP_ORIGIN + location.pathname} /> },
+  ] : [
+    { path: '/login', element: screen(() => import('./screens/FlowGCWebsiteLogin')) },
+    { path: '/app/new/*', element: screen(() => import('./screens/FlowGCAppEmpty'), { urlBase: '/app/new' }) },
+    { path: '/app/*', element: dashboard('/app') },
+    { path: '/invoice', element: invoice() },
+    { path: '/mobile', element: mobile() },
+    ...brandLinks,
+  ]),
+  // Mobile previews and reference screens (demo data)
+  { path: '/mobile/flow', element: screen(() => import('./screens/FlowGCMobileFlow')) },
   { path: '/mobile/redesign', element: screen(() => import('./screens/MobileRedesign')) },
-  { path: '/close-up', element: screen(() => import('./screens/StatGCCloseUp')) },
-  // Earlier AlgoStudio screens, kept for reference
   { path: '/legacy', element: screen(() => import('./screens/Website')) },
   { path: '/legacy/app', element: screen(() => import('./screens/DesktopApp')) },
   { path: '/m', element: screen(() => import('./screens/MobileWebApp'), { bare: true }) },
   { path: '/brand', element: screen(() => import('./screens/BrandView')) },
-  // Working brand links on the localStorage API (Tailwind styled)
-  { path: '/d/:token', element: page(() => import('./pages/brand/TermsLink')) },
-  { path: '/a/:token', element: page(() => import('./pages/brand/ApprovalLink')) },
   { path: '/lab', element: page(() => import('./pages/Lab')) },
   { path: '*', element: page(() => import('./pages/NotFound')) },
-]);
+];
+
+export const router = createBrowserRouter(onApp ? appRoutes : siteRoutes);

@@ -49,9 +49,9 @@
     { id: 'e8', date: '2026-10-08', amount: 1500, category: 'props', note: 'Saree rental for tutorial', dealId: 'ts', receipt: 'rental-slip.jpg', taxDeductible: true },
     { id: 'e9', date: '2026-10-09', amount: 3200, category: 'props', note: 'Décor props, Crawford Market', dealId: 'kl', receipt: 'decor-bill.jpg', taxDeductible: true },
     { id: 'e10', date: '2026-10-10', amount: 4000, category: 'helpers', note: 'Freelance editor for carousel', dealId: 'kl', receipt: 'editor-invoice.pdf', taxDeductible: true },
-    { id: 'e11', date: '2026-10-11', amount: 499, category: 'tools', note: 'Canva Pro, monthly', dealId: null, receipt: 'canva-receipt.pdf', taxDeductible: true },
+    { id: 'e11', date: '2026-10-11', amount: 499, category: 'tools', note: 'Drawly Pro, monthly', dealId: null, receipt: 'canva-receipt.pdf', taxDeductible: true },
     { id: 'e12', date: '2026-10-12', amount: 610, category: 'travel', note: 'Cab to Andheri for bottle shoot', dealId: 'nb', receipt: null, taxDeductible: false },
-    { id: 'e13', date: '2026-09-11', amount: 499, category: 'tools', note: 'Canva Pro, monthly', dealId: null, receipt: 'canva-receipt.pdf', taxDeductible: true },
+    { id: 'e13', date: '2026-09-11', amount: 499, category: 'tools', note: 'Drawly Pro, monthly', dealId: null, receipt: 'canva-receipt.pdf', taxDeductible: true },
     { id: 'e14', date: '2026-09-14', amount: 1299, category: 'equipment', note: 'Phone tripod', dealId: null, receipt: 'tripod-bill.jpg', taxDeductible: true },
   ];
 

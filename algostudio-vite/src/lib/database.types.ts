@@ -60,14 +60,20 @@ export type Database = {
           created_at: string
           currency: string
           declined_on: string | null
+          delivered_on: string | null
+          hook_variants: number
           id: string
+          invoiced_on: string | null
           notes: string | null
           offer_amount: number | null
           offer_reminded_on: string | null
           offer_sent_on: string | null
           project_name: string
+          revisions: number
           terms_agreed_on: string | null
           updated_at: string
+          usage_ends_on: string | null
+          usage_rights: string | null
           user_id: string
         }
         Insert: {
@@ -76,14 +82,20 @@ export type Database = {
           created_at?: string
           currency?: string
           declined_on?: string | null
+          delivered_on?: string | null
+          hook_variants?: number
           id?: string
+          invoiced_on?: string | null
           notes?: string | null
           offer_amount?: number | null
           offer_reminded_on?: string | null
           offer_sent_on?: string | null
           project_name: string
+          revisions?: number
           terms_agreed_on?: string | null
           updated_at?: string
+          usage_ends_on?: string | null
+          usage_rights?: string | null
           user_id?: string
         }
         Update: {
@@ -92,14 +104,20 @@ export type Database = {
           created_at?: string
           currency?: string
           declined_on?: string | null
+          delivered_on?: string | null
+          hook_variants?: number
           id?: string
+          invoiced_on?: string | null
           notes?: string | null
           offer_amount?: number | null
           offer_reminded_on?: string | null
           offer_sent_on?: string | null
           project_name?: string
+          revisions?: number
           terms_agreed_on?: string | null
           updated_at?: string
+          usage_ends_on?: string | null
+          usage_rights?: string | null
           user_id?: string
         }
         Relationships: [
@@ -234,6 +252,7 @@ export type Database = {
           created_at: string
           full_name: string | null
           id: string
+          tax_set_aside_pct: number
           timezone: string
           updated_at: string
         }
@@ -241,6 +260,7 @@ export type Database = {
           created_at?: string
           full_name?: string | null
           id: string
+          tax_set_aside_pct?: number
           timezone?: string
           updated_at?: string
         }
@@ -248,6 +268,7 @@ export type Database = {
           created_at?: string
           full_name?: string | null
           id?: string
+          tax_set_aside_pct?: number
           timezone?: string
           updated_at?: string
         }
@@ -264,7 +285,10 @@ export type Database = {
           created_at: string | null
           currency: string | null
           declined_on: string | null
+          delivered_on: string | null
+          hook_variants: number | null
           id: string | null
+          invoiced_on: string | null
           next_action: string | null
           notes: string | null
           offer_amount: number | null
@@ -273,9 +297,12 @@ export type Database = {
           open_payment_count: number | null
           payment_count: number | null
           project_name: string | null
+          revisions: number | null
           status: string | null
           terms_agreed_on: string | null
           updated_at: string | null
+          usage_ends_on: string | null
+          usage_rights: string | null
           user_id: string | null
           waiting_for_reply: boolean | null
         }
@@ -332,10 +359,13 @@ export type Database = {
         Args: {
           p_cancelled_on: string
           p_declined_on: string
+          p_delivered_on?: string
+          p_invoiced_on?: string
           p_offer_reminded_on: string
           p_offer_sent_on: string
           p_open_payment_count: number
           p_payment_count: number
+          p_received_payment_count?: number
           p_terms_agreed_on: string
         }
         Returns: {

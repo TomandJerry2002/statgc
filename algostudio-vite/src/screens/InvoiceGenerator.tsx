@@ -51,7 +51,7 @@ const add = (s, n) => { const t = Date.parse(s); return isNaN(t) ? '' : new Date
 let uid = 10;
 const DEF = {
   me: { name: 'Riya Sharma', email: 'riya@riyacreates.in', phone: '+91 98765 43210', address: 'Bandra West, Mumbai 400050', tax: 'GSTIN 27ABCDE1234F1Z5' },
-  to: { name: 'Mamaearth', contact: 'collabs@mamaearth.in', address: 'Sector 44, Gurugram, Haryana' },
+  to: { name: 'Leafline Naturals', contact: 'collabs@leafline.example', address: 'Sector 44, Gurugram, Haryana' },
   num: 'INV-2026-014', issue: '2026-11-04', due: 'net15', dueCustom: '', cur: 'INR',
   items: [{ id: 1, desc: 'Diwali reel series: Instagram Reel', qty: 3, rate: 40000 }, { id: 2, desc: 'Usage rights (30 days, paid ads)', qty: 1, rate: 30000 }],
   disc: 0, dep: 50000,

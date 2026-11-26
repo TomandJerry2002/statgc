@@ -1,10 +1,10 @@
-// Live data for StatGCApp (/app only). Loads from the data layer and maps
+// Live data for FlowGCApp (the live dashboard only). Loads from the data layer and maps
 // rows into the shapes the prototype logic already uses. Server-derived
 // values (status, next action, balances) travel in `srv` and are shown
 // as returned; the screen never recomputes them.
 import { supabase } from '@/lib/supabase';
 import { todayIn } from '@/lib/dates';
-import { getMyProfile, updateFullName } from '@/data/profile';
+import { getMyProfile, updateFullName, updateTaxPct } from '@/data/profile';
 import { listBrands, createBrand, updateBrand, deleteBrand } from '@/data/brands';
 import { listDeals, listWaitingDeals, createDeal, updateDeal, deleteCancelledDeal, previewStatus, type DealInput } from '@/data/deals';
 import { listPayments, createPayment, setDisputed, setWrittenOff } from '@/data/payments';
@@ -15,12 +15,16 @@ import { insightsSummary } from '@/data/insights';
 /** Label of the payment added when a deal's price goes up after payments exist. */
 export const BALANCE_LABEL = 'Balance after price change';
 
-export type UIDates = { offerSent: string; reminded: string; agreed: string; declined: string; cancelled: string };
+export type UIDates = { offerSent: string; reminded: string; agreed: string; delivered: string; invoiced: string; declined: string; cancelled: string };
+/** What the price includes and the usage rights, as the deal form edits them. */
+export type UITerms = { usage: string; usageEnd: string; rev: number; hooks: number };
 
 const toDb = (t: UIDates) => ({
   offer_sent_on: t.offerSent || null,
   offer_reminded_on: t.reminded || null,
   terms_agreed_on: t.agreed || null,
+  delivered_on: t.delivered || null,
+  invoiced_on: t.invoiced || null,
   declined_on: t.declined || null,
   cancelled_on: t.cancelled || null,
 });
@@ -53,11 +57,13 @@ export async function loadAll() {
     today,
     profileId: profile?.id ?? null,
     fullName: profile?.full_name ?? '',
+    taxPct: profile?.tax_set_aside_pct ?? 20,
     email: session.data.session?.user.email ?? '',
     brands: brands.map(b => ({ id: b.id, name: b.name, phone: b.phone ?? '', email: b.email ?? '', instagram: b.instagram ?? '' })),
     deals: deals.filter(d => d.id).map(d => ({
       id: d.id!, brandId: d.brand_id, project: d.project_name ?? '', currency: d.currency ?? 'INR', amount: d.offer_amount,
-      dates: { offerSent: d.offer_sent_on ?? '', reminded: d.offer_reminded_on ?? '', agreed: d.terms_agreed_on ?? '', declined: d.declined_on ?? '', cancelled: d.cancelled_on ?? '' },
+      dates: { offerSent: d.offer_sent_on ?? '', reminded: d.offer_reminded_on ?? '', agreed: d.terms_agreed_on ?? '', delivered: d.delivered_on ?? '', invoiced: d.invoiced_on ?? '', declined: d.declined_on ?? '', cancelled: d.cancelled_on ?? '' },
+      usage: d.usage_rights ?? '', usageEnd: d.usage_ends_on ?? '', rev: d.revisions ?? 2, hooks: d.hook_variants ?? 1,
       payments: paymentsBy[d.id!] ?? [],
       srv: { status: d.status, nextAction: d.next_action, paymentCount: d.payment_count ?? 0, openPaymentCount: d.open_payment_count ?? 0 },
     })),
@@ -74,9 +80,10 @@ export const actions = {
    * balance: when an edit raises the price of a deal that already has payments,
    * the extra amount is added as its own payment so it shows as owed everywhere.
    */
-  async saveDeal(x: { id: string | null; brandId: string | null; brandName: string; project: string; currency: string; amount: number; dates: UIDates; balance?: number }) {
+  async saveDeal(x: { id: string | null; brandId: string | null; brandName: string; project: string; currency: string; amount: number; dates: UIDates; terms: UITerms; balance?: number }) {
     const brandId = x.brandId ?? (await createBrand({ name: x.brandName })).id;
-    const fields: DealInput = { brand_id: brandId, project_name: x.project, offer_amount: x.amount, currency: x.currency, ...toDb(x.dates) };
+    const fields: DealInput = { brand_id: brandId, project_name: x.project, offer_amount: x.amount, currency: x.currency, ...toDb(x.dates),
+      usage_rights: x.terms.usage.trim() || null, usage_ends_on: x.terms.usageEnd || null, revisions: x.terms.rev, hook_variants: x.terms.hooks };
     if (!x.id) return createDeal(fields);
     await updateDeal(x.id, fields);
     if (x.balance && x.balance > 0)
@@ -101,7 +108,8 @@ export const actions = {
   deleteBrand,
   setDisputed,
   setWrittenOff,
-  previewStatus: (dates: UIDates, paymentCount: number, openPaymentCount: number) =>
-    previewStatus(toDb(dates), paymentCount, openPaymentCount),
+  previewStatus: (dates: UIDates, paymentCount: number, openPaymentCount: number, receivedPaymentCount: number) =>
+    previewStatus(toDb(dates), paymentCount, openPaymentCount, receivedPaymentCount),
   saveName: (profileId: string, name: string) => updateFullName(profileId, name),
+  saveTaxPct: (profileId: string, pct: number) => updateTaxPct(profileId, pct),
 };
