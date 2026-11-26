@@ -87,13 +87,9 @@ const siteRoutes = [
     { path: '/mobile', element: mobile() },
     ...brandLinks,
   ]),
-  // Mobile previews and reference screens (demo data)
+  // Mobile previews (demo data)
   { path: '/mobile/flow', element: screen(() => import('./screens/FlowGCMobileFlow')) },
   { path: '/mobile/redesign', element: screen(() => import('./screens/MobileRedesign')) },
-  { path: '/legacy', element: screen(() => import('./screens/Website')) },
-  { path: '/legacy/app', element: screen(() => import('./screens/DesktopApp')) },
-  { path: '/m', element: screen(() => import('./screens/MobileWebApp'), { bare: true }) },
-  { path: '/brand', element: screen(() => import('./screens/BrandView')) },
   { path: '/lab', element: page(() => import('./pages/Lab')) },
   { path: '*', element: page(() => import('./pages/NotFound')) },
 ];
