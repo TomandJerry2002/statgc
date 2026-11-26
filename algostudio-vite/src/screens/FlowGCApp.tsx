@@ -85,6 +85,8 @@ const fds = s => { if (!s) return ''; const [, m, d] = s.split('-'); return `${+
 const money = (c, n) => n == null ? '—' : c === 'USD' ? '$' + Math.round(n).toLocaleString('en-US') : c === 'EUR' ? '€' + Math.round(n).toLocaleString('en-IE') : c === 'INR' || !c ? '₹' + Math.round(n).toLocaleString('en-IN') : c + ' ' + Math.round(n).toLocaleString('en-US');
 const oneCur = (deals, cur) => deals.map(d => d.currency === cur ? d : { ...d, currency: cur });
 const CURS = [['INR', 'INR ₹'], ['USD', 'USD $'], ['EUR', 'EUR €']];
+// Live: the choice filters what is shown (no relabelling); "All" shows every currency.
+const curChoices = live => (live ? [['ALL', 'All']] : []).concat(CURS);
 const num = v => +String(v || '').replace(/[^\d.]/g, '');
 const PRIMARY = 'linear-gradient(180deg,#937DDC 0%,#7E65D6 52%,#755CD0 100%)';
 // Chip colours per status code. Labels come from statusLabel (src/data/deals.ts).
@@ -217,7 +219,7 @@ class Component extends DCLogic {
   constructor(props) { super(props); if (!props.live) TODAY = DEMO_TODAY; }  // e.g. after navigating from /app back to the website
   // live (only on /app): real data. Without it (the website's embedded previews) the seed demo runs and nothing calls Supabase.
   state = { ...(this.props.live ? { brands: [], deals: [] } : seed(this.props.demo || 'INR + USD', 'INR')), tpls: {}, page: this.props.startPage || 'home', sbW: 248, sbOpen: true, sbLive: null, cmd: false, cq: '', ci: 0, dealId: null, drawer: null, modal: null, toast: '', w: this.props.embedW || window.innerWidth, dealF: 'all', q: '', payF: 'all', brView: 'list', brSel: null, brF: 'all', brHold: false, game: false,
-    profile: this.props.live ? { name: '', handle: '', email: '', phone: '' } : { name: 'Riya Sharma', handle: 'riya.creates', email: 'riya@riyacreates.in', phone: '+91 98765 43210' }, prefs: { cur: 'INR', terms: 15, tone: 'friendly', signoff: this.props.live ? '' : 'Riya', taxPct: 20 }, insI: 0, insP: false,
+    profile: this.props.live ? { name: '', handle: '', email: '', phone: '' } : { name: 'Riya Sharma', handle: 'riya.creates', email: 'riya@riyacreates.in', phone: '+91 98765 43210' }, prefs: { cur: this.props.live ? 'ALL' : 'INR', terms: 15, tone: 'friendly', signoff: this.props.live ? '' : 'Riya', taxPct: 20 }, insI: 0, insP: false,
     loading: !!this.props.live, loadErr: '', waitIds: [], money: [], insights: [], owedCount: {}, profileId: null, shotUrls: {} };
 
   introScRef = React.createRef();
@@ -293,7 +295,7 @@ class Component extends DCLogic {
       c: ch === i ? '#E2A947' : dark ? 'rgba(255,255,255,.35)' : 'rgba(21,18,43,.22)', lOp: ch === i ? 1 : 0, lTf: ch === i ? 'none' : 'translateX(6px)' }));
     return { tabs, pillX: ({ all: 0, active: 100, paid: 200 })[tab] + '%', kpis: K[tab].map(([l, v]) => ({ l, v })), kOp: S.introSwap ? 0 : 1, kTf: S.introSwap ? 'translateY(4px)' : 'none',
       fan, chs, rail: (S.w || 1200) >= 720,
-      curs: CURS.map(([v, l]) => { const on = S.prefs.cur === v; return { label: l, on: on ? 'true' : 'false', go: () => this.setCur(v), bg: on ? '#6D55C9' : 'transparent', fg: on ? '#FFFFFF' : '#15122B' }; }),
+      curs: curChoices(this.props.live).map(([v, l]) => { const on = S.prefs.cur === v; return { label: l, on: on ? 'true' : 'false', go: () => this.setCur(v), bg: on ? '#6D55C9' : 'transparent', fg: on ? '#FFFFFF' : '#15122B' }; }),
       on: !!S.introOn, scRef: this.introScRef, stRef: this.introStRef, onScroll: () => this.introScroll(), go: () => this.introGo(),
       op: S.introLeave ? 0 : 1, tf: S.introLeave ? 'scale(1.04)' : 'none', ink: dark ? '#FFFFFF' : '#15122B', skipBd: dark ? 'rgba(255,255,255,.3)' : 'rgba(21,18,43,.18)', endPe: S.introEnd ? 'auto' : 'none' };
   }
@@ -431,7 +433,7 @@ class Component extends DCLogic {
     if (t) document.title = t + ' · FlowGC';
   }
   // Live: the URL is read after the first load (reload), once the deals it may name are in.
-  componentDidMount() { if (!this.props.live) this.urlInit(); try { const c = localStorage.getItem('flowgc.cur'); if (c && CURS.some(x => x[0] === c)) this.setState(s => ({ prefs: { ...s.prefs, cur: c }, deals: this.props.live ? s.deals : oneCur(s.deals, c) })); } catch (_) {} if (!this.state.introOn) setTimeout(() => this.maybeTour(), 700); try { const v = JSON.parse(localStorage.getItem('flowgc.sidebar') || 'null'); if (v) this.setState({ sbW: Math.max(200, Math.min(360, +v.w || 248)), sbOpen: v.open !== false }); } catch (_) {} window.addEventListener('keydown', this.onGlobalKey); this._dfRs = () => { this._dfLast = null; this._dfKey = true; this.dfSync(); this._dfKey = false; }; window.addEventListener('resize', this._dfRs); if (document.fonts && document.fonts.ready) document.fonts.ready.then(this._dfRs); this.dfSync(); if (this.state.introOn === undefined) this.setState({ introOn: this.introInit() }, () => this.introScroll()); this._rs = () => { this.state.introOn && this.introScroll(); if (!this.props.embedW) this.setState({ w: window.innerWidth }); }; window.addEventListener('resize', this._rs); this._gc = () => this.setState({ game: false }); document.addEventListener('orbitclose', this._gc); this._ins = setInterval(() => { if (!this.state.insP && this.state.page === 'home') this.setState(s => ({ insI: s.insI + 1 })); }, 6000); if (this.props.live) this.reload(true); }
+  componentDidMount() { if (!this.props.live) this.urlInit(); try { const c = localStorage.getItem('flowgc.cur'); if (c && curChoices(this.props.live).some(x => x[0] === c)) this.setState(s => ({ prefs: { ...s.prefs, cur: c }, deals: this.props.live ? s.deals : oneCur(s.deals, c) })); } catch (_) {} if (!this.state.introOn) setTimeout(() => this.maybeTour(), 700); try { const v = JSON.parse(localStorage.getItem('flowgc.sidebar') || 'null'); if (v) this.setState({ sbW: Math.max(200, Math.min(360, +v.w || 248)), sbOpen: v.open !== false }); } catch (_) {} window.addEventListener('keydown', this.onGlobalKey); this._dfRs = () => { this._dfLast = null; this._dfKey = true; this.dfSync(); this._dfKey = false; }; window.addEventListener('resize', this._dfRs); if (document.fonts && document.fonts.ready) document.fonts.ready.then(this._dfRs); this.dfSync(); if (this.state.introOn === undefined) this.setState({ introOn: this.introInit() }, () => this.introScroll()); this._rs = () => { this.state.introOn && this.introScroll(); if (!this.props.embedW) this.setState({ w: window.innerWidth }); }; window.addEventListener('resize', this._rs); this._gc = () => this.setState({ game: false }); document.addEventListener('orbitclose', this._gc); this._ins = setInterval(() => { if (!this.state.insP && this.state.page === 'home') this.setState(s => ({ insI: s.insI + 1 })); }, 6000); if (this.props.live) this.reload(true); }
   confetti(btn) {
     if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     const cv = document.createElement('canvas'), dpr = Math.min(2, window.devicePixelRatio || 1), W = innerWidth, H = innerHeight;
@@ -462,7 +464,7 @@ class Component extends DCLogic {
   gKey = e => { if (e.key === 'Escape') this.closeGraph(); };
   closeGraph = () => { window.removeEventListener('keydown', this.gKey); this.setState({ graph: null }); };
   graphVals() {
-    const S = this.state, show = e => { window.addEventListener('keydown', this.gKey); this.setState({ graph: { cur: null, h: null } }); this.confetti(e && e.currentTarget); };
+    const S = this.viewState(), show = e => { window.addEventListener('keydown', this.gKey); this.setState({ graph: { cur: null, h: null } }); this.confetti(e && e.currentTarget); };
     if (!S.graph) return { open: false, show };
     const has = c => S.deals.some(d => d.currency === c && d.payments.length);
     const list = CURS.map(c => c[0]).filter(has), cur = list.includes(S.graph.cur) ? S.graph.cur : list[0];
@@ -592,7 +594,7 @@ class Component extends DCLogic {
    * something to say, so a new account shows no box (never 0% or NaN).
    */
   liveInsights() {
-    const rows = this.state.insights, multi = rows.length > 1, slides = [];
+    const rows = this.viewState().insights, multi = rows.length > 1, slides = [];
     const s = n => (n === 1 ? '' : 's'), cur = c => (multi ? ' ' + c : '');
     rows.forEach(r => { if (r.overdue_count > 0) slides.push({
       big: money(r.currency, r.overdue_amount), head: `overdue across ${r.overdue_count}${cur(r.currency)} payment${s(r.overdue_count)}.`,
@@ -749,7 +751,7 @@ class Component extends DCLogic {
   openDealForm(d, brandId) {
     const bn = id => (this.state.brands.find(b => b.id === id) || {}).name || '';
     const draft = d ? { id: d.id, brandId: d.brandId, brandName: bn(d.brandId), project: d.project, currency: d.currency, amount: d.amount == null ? '' : String(d.amount), dates: { ...D0, ...d.dates }, hasPays: d.payments.length > 0, usage: d.usage || '', usageEnd: d.usageEnd || '', rev: String(d.rev ?? 2), hooks: String(d.hooks ?? 1) }
-      : { id: null, brandId: brandId || '', brandName: bn(brandId), project: '', currency: this.state.prefs.cur, amount: '', dates: { ...D0 }, hasPays: false, usage: '', usageEnd: '', rev: '2', hooks: '1' };
+      : { id: null, brandId: brandId || '', brandName: bn(brandId), project: '', currency: this.state.prefs.cur === 'ALL' ? 'INR' : this.state.prefs.cur, amount: '', dates: { ...D0 }, hasPays: false, usage: '', usageEnd: '', rev: '2', hooks: '1' };
     this.setState({ modal: { type: 'deal', draft, prev: d && d.srv ? d.srv.status : null }, drawer: null }, () => { if (!d) this.schedulePreview(0); });
   }
   saveDeal() {
@@ -817,7 +819,7 @@ class Component extends DCLogic {
     if (this.props.live) {
       // received_on is the date in the form (defaults to today in the user's timezone).
       // The screenshot (if any) is uploaded first; its storage path is saved on the receipt.
-      this.write(() => actions.addReceipt({ paymentId: M.pid, amount: amt, date: dr.date, method: dr.method, utr: dr.utr.trim(), file: dr.shot ? dr.shot.file : null }), 'Payment recorded', m => this.err(m))
+      this.write(() => actions.addReceipt({ paymentId: M.pid, amount: amt, date: dr.date, method: dr.method, utr: dr.utr.trim(), file: dr.shot ? dr.shot.file : null }), 'Payment recorded · set aside ' + this.taxOf(this.findPay(M.pid)?.d.currency || 'INR', amt) + ' for tax', m => this.err(m))
         .then(r => { if (r.ok) { if (dr.shot) URL.revokeObjectURL(dr.shot.url); this.setState({ modal: null, drawer: M.pid }); } });
       return;
     }
@@ -912,8 +914,15 @@ class Component extends DCLogic {
       if (this.state.cmd) { e.preventDefault(); this.setCmd(false); }
     }
   };
+  /** Live: when a currency is chosen in Settings, show only that currency's deals, totals and insights. Nothing is saved. */
+  viewState() {
+    const s = this.state, c = s.prefs.cur;
+    if (!this.props.live || !c || c === 'ALL') return s;
+    const deals = s.deals.filter(d => d.currency === c || (s.page === 'deal' && d.id === s.dealId)), ids = new Set(deals.map(d => d.id));
+    return { ...s, deals, money: s.money.filter(r => r.currency === c), insights: (s.insights || []).filter(r => r.currency === c), waitIds: s.waitIds.filter(id => ids.has(id)) };
+  }
   renderVals() {
-    const S = this.state, wide = S.w >= 900, LIVE = !!this.props.live;
+    const S = this.viewState(), wide = S.w >= 900, LIVE = !!this.props.live;
     const go = pg => () => this.setState({ page: pg, drawer: null, game: false });
     const curNav = S.page === 'deal' ? 'deals' : S.page;
     const nav = [['home', 'Home', 'house'], ['deals', 'Deals', 'handshake'], ['money', 'Money', 'wallet'], ['brands', 'Brands', 'building-2']].map(([k, l, ic]) => ({
@@ -1224,7 +1233,7 @@ class Component extends DCLogic {
     const me = { ini: initials(P.name), name: P.name.trim() || 'Your name', handle: P.handle ? '@' + P.handle : 'Add a handle', cur: onSet ? 'page' : undefined, bg: onSet ? 'rgba(126,101,214,.12)' : 'transparent', fg: onSet ? '#6D55C9' : '#8A8A93' };
     const st = { ini: me.ini, name: P.name, handle: P.handle, handleAt: me.handle, email: P.email, phone: P.phone,
       onName: setP('name'), onHandle: setP('handle'), onEmail: setP('email'), onPhone: setP('phone'),
-      curs: CURS.map(([v, l]) => opt('cur', v, l)),
+      curs: curChoices(LIVE).map(([v, l]) => opt('cur', v, l)),
       terms: [7, 15, 30, 45].map(v => opt('terms', v, v + ' days')),
       termsHint: `New payments default to a due date ${F.terms} days after you add them, e.g. ${fd(addDays(TODAY, F.terms))} if added today.`,
       signoff: F.signoff, onSignoff: e => setF('signoff', e.target.value),
