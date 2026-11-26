@@ -17,7 +17,7 @@ const DESC = 'FlowGC turns your WhatsApp and DM brand chats into a clear deal pa
 const sections = [
   { id: 'what', h: 'Everything a brand deal needs, from the offer to the last payment' },
   { id: 'how', h: 'From the offer to the last payment, one deal at a time', items: [
-    ['Add the brand', 'Name, contact person, phone, email and UPI ID, saved once.'],
+    ['Add the brand', 'Name, phone, email and Instagram handle, saved once.'],
     ['Log the offer', 'Enter the dates as it moves. The status and next step update on their own.'],
     ['Split into payments', 'An advance and a final payment, each with its own amount and due date.'],
     ['Record what arrives', 'Part payments with method, UTR and a screenshot. See what is still owed.'],
@@ -25,7 +25,7 @@ const sections = [
   { id: 'risks', h: 'A next step on every deal', p: 'Worked out from the dates you enter.' },
   { id: 'overview', h: 'Every brand, deal and payment, connected' },
   { id: 'proof', h: 'Every payment is recorded with proof', p: 'Record each payment as it arrives, including part payments, with the method, UTR number and a screenshot. FlowGC shows what is paid and still owed, and lets you mark a payment as disputed or written off, then undo it.' },
-  { id: 'brands', h: 'A running tally for every brand you work with', p: 'Save each brand once with a contact person, phone, email and UPI ID. FlowGC totals what each one has paid you, tracks how many payments arrived on time and shows which brand has paid you the most.' },
+  { id: 'brands', h: 'A running tally for every brand you work with', p: 'Save each brand once with its phone, email and Instagram handle. FlowGC totals what each one has paid you, tracks how many payments arrived on time and shows which brand has paid you the most.' },
   { id: 'start', h: 'Start with the next brand deal you get', p: 'Add the brand and the offer. FlowGC tells you what to do next.' },
 ];
 

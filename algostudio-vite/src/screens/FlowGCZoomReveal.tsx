@@ -110,7 +110,7 @@ class Component extends DCLogic {
     const s = this.state, m = s.m, still = s.still;
     const btn = k => ({ y: s.rb === k ? '-50%' : '0%', on: () => this.setState({ rb: k }), off: () => this.setState(st => st.rb === k ? { rb: null } : null) });
     const steps = [
-      ['01', 'Add the brand', 'Name, contact person, phone, email and UPI ID, saved once.'],
+      ['01', 'Add the brand', 'Name, phone, email and Instagram handle, saved once.'],
       ['02', 'Log the offer', 'Enter the dates as it moves. The status and next step update on their own.'],
       ['03', 'Split into payments', 'An advance and a final payment, each with its own amount and due date.'],
       ['04', 'Record what arrives', 'Part payments with method, UTR and a screenshot. See what is still owed.']
@@ -128,7 +128,7 @@ class Component extends DCLogic {
       stepCols: m ? 'minmax(0,1fr)' : '80px minmax(0,1fr) minmax(0,360px)',
       steps: steps.map(([n, t, b], i) => { const on = s.step === i; return { n, t, b, nc: on ? '#F0BE5E' : '#A48EEA', tc: on ? '#F0BE5E' : '#F3F4F8', x: on && !m ? '16px' : '0px', on: () => this.setState({ step: i }), off: () => this.setState(st => st.step === i ? { step: -1 } : null) }; }),
       feats: [
-        { t: 'Brands', b: 'Every brand with its contact person, phone, email and UPI ID.' },
+        { t: 'Brands', b: 'Every brand with its phone, email and Instagram handle.' },
         { t: 'Deal status', b: 'Draft offer, Offer sent, Offer follow-up, Agreed / Active, Declined or Cancelled, worked out from your dates.' },
         { t: 'Next step', b: 'Send offer, Send reminder, Await reply, Create payment schedule, Collect payment or Done. Deals waiting on the brand are flagged.' },
         { t: 'Payments', b: 'Split a deal into payments with their own amounts and due dates. See paid and still owed on each one.' },
