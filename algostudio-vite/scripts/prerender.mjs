@@ -7,7 +7,7 @@ import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const SITE = (process.env.SITE_URL || 'https://flowgc.co').replace(/\/$/, '');
+const SITE = (process.env.SITE_URL || 'https://www.flowgc.co').replace(/\/$/, '');
 const DIST = fileURLToPath(new URL('../dist/', import.meta.url));  // fileURLToPath: also correct on Windows
 const shell = readFileSync(join(DIST, 'index.html'), 'utf8');
 const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
