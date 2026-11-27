@@ -9,7 +9,7 @@ import { fail } from './errors';
 export async function dealForInvoice(id: string) {
   const db = supabase();
   const { data: deal, error } = await db.from('deals')
-    .select('brand_id, project_name, offer_amount, currency, usage_rights, usage_ends_on, revisions, hook_variants')
+    .select('brand_id, project_name, offer_amount, currency, usage_rights, usage_ends_on, revisions, hook_variants, terms_agreed_on, invoiced_on, cancelled_on')
     .eq('id', id).maybeSingle();
   if (error) fail(error);
   if (!deal) return null;

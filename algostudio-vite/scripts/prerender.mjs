@@ -101,8 +101,14 @@ const head = r => {
   ].join('\n    ');
 };
 
+// The app subdomain serves these same files (app.flowgc.co/ is the dashboard), so there the
+// website snapshot is hidden before it paints instead of flashing until React replaces it.
+const HIDE_ON_APP = `<script>if(location.hostname.indexOf('app.')===0)document.documentElement.setAttribute('data-app-host','')</script>
+    <style>[data-app-host] [data-prerender]{display:none!important}</style>`;
+
 for (const r of routes) {
   const html = shell
+    .replace('<head>', `<head>\n    ${HIDE_ON_APP}`)
     .replace(/<title>[\s\S]*?<\/title>/, head(r))
     .replace(/<meta name="description"[^>]*>\s*/, '')
     .replace('<div id="root"></div>', `<div id="root">${r.body}</div>`);
