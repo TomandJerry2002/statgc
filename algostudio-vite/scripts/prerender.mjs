@@ -12,7 +12,10 @@ const DIST = fileURLToPath(new URL('../dist/', import.meta.url));  // fileURLToP
 const shell = readFileSync(join(DIST, 'index.html'), 'utf8');
 const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
-const DESC = 'FlowGC turns your WhatsApp and DM brand chats into a clear deal page, so you know what was promised, what’s due, and when the money lands.';
+// Homepage questions, shared with src/screens/FlowGCFaq.tsx
+const FAQ = JSON.parse(readFileSync(fileURLToPath(new URL('../src/content/faq.json', import.meta.url)), 'utf8'));
+
+const DESC ='FlowGC turns your WhatsApp and DM brand chats into a clear deal page, so you know what was promised, what’s due, and when the money lands.';
 
 const sections = [
   { id: 'what', h: 'Everything a brand deal needs, from the offer to the last payment' },
@@ -26,6 +29,7 @@ const sections = [
   { id: 'overview', h: 'Every brand, deal and payment, connected' },
   { id: 'proof', h: 'Every payment is recorded with proof', p: 'Record each payment as it arrives, including part payments, with the method, UTR number and a screenshot. FlowGC shows what is paid and still owed, and lets you mark a payment as disputed or written off, then undo it.' },
   { id: 'brands', h: 'A running tally for every brand you work with', p: 'Save each brand once with its phone, email and Instagram handle. FlowGC totals what each one has paid you, tracks how many payments arrived on time and shows which brand has paid you the most.' },
+  { id: 'faq', h: 'Questions creators ask about FlowGC', qa: FAQ },
   { id: 'start', h: 'Start with the next brand deal you get', p: 'Add the brand and the offer. FlowGC tells you what to do next.' },
 ];
 
@@ -42,7 +46,7 @@ const homeBody = `
       <p style="margin:22px 0 0;max-width:600px;font-size:18px;line-height:1.55;color:#A9ADBF">${esc(DESC)}</p>
       <p style="margin:32px 0 0;display:flex;gap:12px;flex-wrap:wrap;justify-content:center"><a href="/login" style="padding:14px 24px;border-radius:12px;background:#F3F4F8;color:#07060F;font-weight:700;text-decoration:none">Get started</a><a href="#how" style="padding:14px 22px;border-radius:12px;border:1px solid rgba(255,255,255,.18);color:#F3F4F8;text-decoration:none">How it works</a></p>
     </section>
-    ${sections.map(s => `<section id="${s.id}" style="max-width:1120px;margin:0 auto;padding:72px 24px"><h2 style="margin:0;font-family:Jost,sans-serif;font-weight:500;font-size:36px">${esc(s.h)}</h2>${s.p ? `<p style="max-width:620px;color:#A9ADBF;line-height:1.5">${esc(s.p)}</p>` : ''}${s.items ? `<ol>${s.items.map(([t, b]) => `<li><h3>${esc(t)}</h3><p style="color:#A9ADBF">${esc(b)}</p></li>`).join('')}</ol>` : ''}</section>`).join('\n    ')}
+    ${sections.map(s => `<section id="${s.id}" style="max-width:1120px;margin:0 auto;padding:72px 24px"><h2 style="margin:0;font-family:Jost,sans-serif;font-weight:500;font-size:36px">${esc(s.h)}</h2>${s.p ? `<p style="max-width:620px;color:#A9ADBF;line-height:1.5">${esc(s.p)}</p>` : ''}${s.qa ? s.qa.map(([q, a]) => `<h3>${esc(q)}</h3><p style="max-width:680px;color:#A9ADBF;line-height:1.5">${esc(a)}</p>`).join('') : ''}${s.items ? `<ol>${s.items.map(([t, b]) => `<li><h3>${esc(t)}</h3><p style="color:#A9ADBF">${esc(b)}</p></li>`).join('')}</ol>` : ''}</section>`).join('\n    ')}
   </main>
   <footer style="padding:28px 24px;color:#A9ADBF;font-size:13px">© 2026 FlowGC</footer>
 </div>`;
@@ -100,6 +104,9 @@ const routes = [
           { '@type': 'Audience', audienceType: 'Freelancers' },
           { '@type': 'Audience', audienceType: 'UGC Creators' },
         ] },
+      // ── FAQPage: the "Questions creators ask" section, word for word ──
+      { '@type': 'FAQPage', '@id': SITE + '/#faq', about: { '@id': SITE + '/#app' },
+        mainEntity: FAQ.map(([q, a]) => ({ '@type': 'Question', name: q, acceptedAnswer: { '@type': 'Answer', text: a } })) },
     ] }] },
   { path: '/login', title: 'Log in · FlowGC', desc: 'Log in to FlowGC to track your brand deals and payments.', body: loginBody, index: false },  // hands off to app.flowgc.co, which is noindex
   { path: '/privacy', title: 'Privacy Policy · FlowGC', desc: 'How FlowGC collects, uses and protects your data, and the rights you have over it.', body: privacyBody, priority: '0.3' },

@@ -1,0 +1,12 @@
+[
+  ["What is FlowGC?", "FlowGC is a web app for content creators, freelancers and UGC creators in India. It tracks every brand deal from the first offer to the last payment, so you know what was promised, what is due and when the money lands."],
+  ["How do I add a brand deal?", "Add the brand once with its name, phone, email and Instagram handle, then log the offer. As you enter dates, FlowGC works out the status, from Draft offer to Agreed / Active, and shows the next step on the deal."],
+  ["Can the brand confirm the deal terms?", "Yes. You send the brand a link to confirm the terms: the deliverables, the amount, the payment due dates and the usage rights. FlowGC shows when it is waiting for the brand and when the link expires."],
+  ["What happens after the brand agrees?", "Once the brand has agreed, you submit your work through a review link. The brand can approve it, or ask for a revision if they want changes. FlowGC tracks each revision request."],
+  ["How does FlowGC track payments?", "Split a deal into an advance and a final payment, each with its own amount and due date. Log part payments as they arrive with the payment method, UTR number and a screenshot as proof. FlowGC shows what is paid and what is still owed, and you can mark a payment as disputed or written off."],
+  ["Does FlowGC help with tax?", "Yes. FlowGC shows how much of each payment to set aside for tax, 20% by default."],
+  ["What happens when a brand pays late?", "The deal is marked overdue and FlowGC drafts a payment reminder with the agreed terms. You send it yourself on WhatsApp or email. FlowGC never messages a brand on your behalf."],
+  ["Can I make invoices with FlowGC?", "Yes. The invoice generator creates an invoice for a brand deal, with your bank or UPI details."],
+  ["Does FlowGC handle other currencies?", "Yes. Each deal has its own currency, such as rupees or US dollars, and amounts owed and received are shown per currency."],
+  ["Is FlowGC free?", "You can start using FlowGC for free. A paid plan will be added later."]
+]
