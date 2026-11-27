@@ -74,7 +74,7 @@ const routes = [
       { '@context': 'https://schema.org', '@type': 'SoftwareApplication', name: 'FlowGC', applicationCategory: 'BusinessApplication', operatingSystem: 'Web', description: DESC, url: SITE + '/' },
       { '@context': 'https://schema.org', '@type': 'Organization', name: 'FlowGC', url: SITE + '/', logo: SITE + '/assets/logo-as.png' },
     ] },
-  { path: '/login', title: 'Log in · FlowGC', desc: 'Log in to FlowGC to track your brand deals and payments.', body: loginBody, priority: '0.5' },
+  { path: '/login', title: 'Log in · FlowGC', desc: 'Log in to FlowGC to track your brand deals and payments.', body: loginBody, index: false },  // hands off to app.flowgc.co, which is noindex
   { path: '/privacy', title: 'Privacy Policy · FlowGC', desc: 'How FlowGC collects, uses and protects your data, and the rights you have over it.', body: privacyBody, priority: '0.3' },
   { path: '/terms', title: 'Terms and Conditions · FlowGC', desc: 'The terms for using the FlowGC website, web app and mobile app.', body: legal('Terms and Conditions', 'These terms cover your use of the FlowGC website, web app and mobile app.'), priority: '0.3' },
   { path: '/data', title: 'Data Collection · FlowGC', desc: 'Every type of data FlowGC collects, why, who it is shared with and how long it is kept.', body: legal('Data Collection', 'A plain list of the data FlowGC collects, why we need it, who processes it and how long we keep it.'), priority: '0.3' },
@@ -86,7 +86,7 @@ const head = r => {
     `<title>${esc(r.title)}</title>`,
     `<meta name="description" content="${esc(r.desc)}" />`,
     `<link rel="canonical" href="${url}" />`,
-    `<meta name="robots" content="index,follow" />`,
+    `<meta name="robots" content="${r.index === false ? 'noindex,follow' : 'index,follow'}" />`,
     `<meta property="og:type" content="website" />`,
     `<meta property="og:site_name" content="FlowGC" />`,
     `<meta property="og:title" content="${esc(r.title)}" />`,
@@ -135,7 +135,7 @@ writeFileSync(join(DIST, 'robots.txt'), [
 const today = new Date().toISOString().slice(0, 10);
 writeFileSync(join(DIST, 'sitemap.xml'), `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-${routes.map(r => `  <url><loc>${SITE}${r.path}</loc><lastmod>${today}</lastmod><priority>${r.priority}</priority></url>`).join('\n')}
+${routes.filter(r => r.index !== false).map(r => `  <url><loc>${SITE}${r.path}</loc><lastmod>${today}</lastmod><priority>${r.priority}</priority></url>`).join('\n')}
 </urlset>
 `);
 
