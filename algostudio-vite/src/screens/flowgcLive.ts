@@ -6,7 +6,7 @@ import { supabase } from '@/lib/supabase';
 import { todayIn } from '@/lib/dates';
 import { getMyProfile, updateFullName, updateTaxPct } from '@/data/profile';
 import { listBrands, createBrand, updateBrand, deleteBrand } from '@/data/brands';
-import { listDeals, listWaitingDeals, createDeal, updateDeal, deleteCancelledDeal, previewStatus, type DealInput } from '@/data/deals';
+import { listDeals, listWaitingDeals, createDeal, updateDeal, deleteDeal, previewStatus, type DealInput } from '@/data/deals';
 import { listPayments, createPayment, setDisputed, setWrittenOff } from '@/data/payments';
 import { listReceipts, createReceipt, deleteReceipt, signedUrls, signedUrl, checkScreenshot } from '@/data/receipts';
 import { moneySummary, countOwedPayments } from '@/data/money';
@@ -90,7 +90,15 @@ export const actions = {
       await createPayment({ deal_id: x.id, currency: x.currency, label: BALANCE_LABEL, amount: x.balance, due_date: null });
     return x.id;
   },
-  deleteDeal: deleteCancelledDeal,
+  deleteDeal,
+  /** Deletes the brand's deals (with their payments and screenshots), then the brand. */
+  async deleteBrandAndDeals(brandId: string, dealIds: string[]) {
+    for (const id of dealIds) await deleteDeal(id);
+    await deleteBrand(brandId);
+  },
+  /** The brand's answer to the offer: agreed or declined on that date. */
+  setReply: (dealId: string, agreed: boolean, date: string) =>
+    updateDeal(dealId, agreed ? { terms_agreed_on: date } : { declined_on: date }),
   markDate: (dealId: string, key: 'offerSent' | 'reminded', today: string) =>
     updateDeal(dealId, key === 'offerSent' ? { offer_sent_on: today } : { offer_reminded_on: today }),
   addPayment: (x: { dealId: string; currency: string; label: string; amount: number; dueDate: string }) =>

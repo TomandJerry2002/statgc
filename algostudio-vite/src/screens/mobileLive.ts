@@ -10,7 +10,6 @@
 // - due: the earliest due date among the deal's open payments.
 // Declined and cancelled deals stay on the desktop app only.
 import { loadAll, actions } from './flowgcLive';
-import { updateDeal } from '@/data/deals';
 import { createPayment, updatePayment } from '@/data/payments';
 
 export const INVOICE = 'Invoice';
@@ -112,11 +111,7 @@ export const mobileActions = {
     for (const p of open) await updatePayment(p.id, { label: toInvoice(p.label), due_date: p.dueDate && p.dueDate < due ? p.dueDate : due });
   },
 
-  /** The backend only deletes cancelled deals, so cancel first. */
-  async deleteDeal(d: MDeal, today: string) {
-    await updateDeal(d.id, { cancelled_on: today });
-    await actions.deleteDeal(d.id);
-  },
+  deleteDeal: (d: MDeal, _today?: string) => actions.deleteDeal(d.id),
 
   setBrandEmail: (brandId: string, email: string) => actions.editBrand(brandId, { email }),
   saveName: actions.saveName,

@@ -67,11 +67,10 @@ export async function updateDeal(id: string, patch: DealPatch): Promise<void> {
 }
 
 /**
- * Deletes a cancelled deal. Its payments and receipts go with it (on delete
- * cascade); receipt screenshots are then removed from Storage. Only deals
- * with cancelled_on set are deleted, so this can't remove an active deal.
+ * Deletes a deal. Its payments and receipts go with it (on delete cascade);
+ * receipt screenshots are then removed from Storage.
  */
-export async function deleteCancelledDeal(id: string): Promise<void> {
+export async function deleteDeal(id: string): Promise<void> {
   const db = supabase();
   // Read the screenshot paths first: the rows are gone after the delete.
   const { data: pays, error: pe } = await db.from('payments').select('id').eq('deal_id', id);
@@ -82,9 +81,9 @@ export async function deleteCancelledDeal(id: string): Promise<void> {
     if (re) fail(re, 'deal.delete');
     paths = recs.map(r => r.screenshot_path).filter((p): p is string => !!p);
   }
-  const { data, error } = await db.from('deals').delete().eq('id', id).not('cancelled_on', 'is', null).select('id');
+  const { data, error } = await db.from('deals').delete().eq('id', id).select('id');
   if (error) fail(error, 'deal.delete');
-  if (!data.length) throw new DataError('Only cancelled deals can be deleted.', null);
+  if (!data.length) throw new DataError('This deal was already deleted.', null);
   await removeFiles(paths);
 }
 
