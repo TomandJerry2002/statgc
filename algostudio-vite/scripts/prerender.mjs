@@ -78,13 +78,15 @@ const routes = [
       // ── SoftwareApplication: the platform, and who it is for ──
       { '@type': 'SoftwareApplication', '@id': SITE + '/#app', name: 'FlowGC', url: SITE + '/', description: DESC,
         applicationCategory: 'BusinessApplication', applicationSubCategory: 'Brand deal and payment tracking', operatingSystem: 'Web',
-        publisher: { '@id': SITE + '/#organization' },
+        provider: { '@id': SITE + '/#organization' }, publisher: { '@id': SITE + '/#organization' },
         offers: { '@type': 'Offer', price: '0', priceCurrency: 'INR' },  // "Get started free" on the homepage
+        // Each line matches something the homepage says
         featureList: [
+          'Brand deal tracking from the offer to the last payment',
           'Turn WhatsApp and DM brand chats into a deal page',
-          'Track every deal from the offer to the last payment',
-          'Split a deal into an advance and a final payment with due dates',
-          'Record part payments with method, UTR number and screenshot',
+          'Payment milestones: an advance and a final payment, each with its own amount and due date',
+          'UTR number and screenshot proof logged with every payment, including part payments',
+          'Tax set-aside calculation on every payment (20% by default)',
           'Payment reminders for overdue payments',
           'Running tally of what each brand has paid',
           'Invoice generator for brand deals',
