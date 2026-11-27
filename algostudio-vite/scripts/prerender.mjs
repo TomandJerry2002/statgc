@@ -70,10 +70,35 @@ const legal = (h, intro) => `
 
 const routes = [
   { path: '/', title: 'FlowGC · Brand deals and payments for creators', desc: DESC, body: homeBody, priority: '1.0',
-    ld: [
-      { '@context': 'https://schema.org', '@type': 'SoftwareApplication', name: 'FlowGC', applicationCategory: 'BusinessApplication', operatingSystem: 'Web', description: DESC, url: SITE + '/' },
-      { '@context': 'https://schema.org', '@type': 'Organization', name: 'FlowGC', url: SITE + '/', logo: SITE + '/assets/logo-as.png' },
-    ] },
+    ld: [{ '@context': 'https://schema.org', '@graph': [
+      // ── Organization: who makes FlowGC ──
+      { '@type': 'Organization', '@id': SITE + '/#organization', name: 'FlowGC', url: SITE + '/', logo: SITE + '/assets/logo-as.png' },
+      // ── WebSite: the public site ──
+      { '@type': 'WebSite', '@id': SITE + '/#website', name: 'FlowGC', url: SITE + '/', inLanguage: 'en-IN', publisher: { '@id': SITE + '/#organization' } },
+      // ── SoftwareApplication: the platform, and who it is for ──
+      { '@type': 'SoftwareApplication', '@id': SITE + '/#app', name: 'FlowGC', url: SITE + '/', description: DESC,
+        applicationCategory: 'BusinessApplication', applicationSubCategory: 'Brand deal and payment tracking', operatingSystem: 'Web',
+        publisher: { '@id': SITE + '/#organization' },
+        offers: { '@type': 'Offer', price: '0', priceCurrency: 'INR' },  // "Get started free" on the homepage
+        featureList: [
+          'Turn WhatsApp and DM brand chats into a deal page',
+          'Track every deal from the offer to the last payment',
+          'Split a deal into an advance and a final payment with due dates',
+          'Record part payments with method, UTR number and screenshot',
+          'Payment reminders for overdue payments',
+          'Running tally of what each brand has paid',
+          'Invoice generator for brand deals',
+        ],
+        // ── Invoice: the app creates invoices for brand deals (no sample invoice: real ones are private) ──
+        potentialAction: { '@type': 'CreateAction', name: 'Create an invoice for a brand deal',
+          target: { '@type': 'EntryPoint', urlTemplate: 'https://app.flowgc.co/invoice' },
+          result: { '@type': 'Invoice', name: 'Brand deal invoice', description: 'An invoice a creator sends to a brand for a deal, with the deliverables, amount, due date and bank or UPI details.' } },
+        audience: [
+          { '@type': 'Audience', audienceType: 'Content Creators' },
+          { '@type': 'Audience', audienceType: 'Freelancers' },
+          { '@type': 'Audience', audienceType: 'UGC Creators' },
+        ] },
+    ] }] },
   { path: '/login', title: 'Log in · FlowGC', desc: 'Log in to FlowGC to track your brand deals and payments.', body: loginBody, index: false },  // hands off to app.flowgc.co, which is noindex
   { path: '/privacy', title: 'Privacy Policy · FlowGC', desc: 'How FlowGC collects, uses and protects your data, and the rights you have over it.', body: privacyBody, priority: '0.3' },
   { path: '/terms', title: 'Terms and Conditions · FlowGC', desc: 'The terms for using the FlowGC website, web app and mobile app.', body: legal('Terms and Conditions', 'These terms cover your use of the FlowGC website, web app and mobile app.'), priority: '0.3' },
