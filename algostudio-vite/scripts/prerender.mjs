@@ -120,21 +120,13 @@ for (const r of routes) {
 // The app shell for everything else (the SPA fallback) stays out of search results.
 writeFileSync(join(DIST, '200.html'), shell.replace('<head>', '<head>\n    <meta name="robots" content="noindex" />'));
 
+// App pages (/app, /mobile, /invoice, /lab, /close-up) stay crawlable on purpose: they serve
+// 200.html with noindex, and Google only drops a page it is allowed to fetch and see that on.
+// Brand links carry private tokens, so crawlers are kept out of them entirely.
 writeFileSync(join(DIST, 'robots.txt'), [
   'User-agent: *',
-  'Allow: /$',
-  'Allow: /login',
-  'Allow: /privacy',
-  'Allow: /terms',
-  'Allow: /data',
-  'Allow: /assets/',
-  'Disallow: /app',
-  'Disallow: /mobile',
   'Disallow: /d/',
   'Disallow: /a/',
-  'Disallow: /lab',
-  'Disallow: /invoice',
-  'Disallow: /close-up',
   '',
   `Sitemap: ${SITE}/sitemap.xml`,
   '',
