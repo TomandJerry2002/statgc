@@ -1,4 +1,4 @@
-# StatGC (Vite)
+# FlowGC (Vite)
 
 React 19 + TypeScript + React Router 7, built from the AlgoStudio design files.
 
@@ -12,12 +12,12 @@ npm run typecheck  # optional; not part of the build
 ## Routes
 
 Main site:
-- `/`: StatGC website (from `StatGC Website.dc.html`). "Log in" opens the login over the page; the "Inside the app" preview embeds the app
-- `/login`: StatGC login on its own page (from `StatGC Website Login.dc.html`). Google sign-in; afterwards phones open `/mobile` and computers open `/app`
-- `/close-up`: StatGC close-up page with the scroll zoom, word reveal and falling-letter text (from `StatGC Close-up.dc.html`)
-- `/app`: StatGC app: Home, Deals, Money, Brands with Orbit view and Orbit Catch, Settings (from `AlgoStudio V1.dc.html`). "Invoices" in the sidebar opens `/invoice`
+- `/`: FlowGC website (from `FlowGC Website.dc.html`). "Log in" opens the login over the page; the "Inside the app" preview embeds the app
+- `/login`: FlowGC login on its own page (from `FlowGC Website Login.dc.html`). Google sign-in; afterwards phones open `/mobile` and computers open `/app`
+- `/close-up`: FlowGC close-up page with the scroll zoom, word reveal and falling-letter text (from `FlowGC Close-up.dc.html`)
+- `/app`: FlowGC app: Home, Deals, Money, Brands with Orbit view and Orbit Catch, Settings (from `AlgoStudio V1.dc.html`). "Invoices" in the sidebar opens `/invoice`
 - `/app/new`: the app as a brand-new creator sees it: empty states with animated pictures, progress chart with confetti, icons-only sidebar (from `AlgoStudio V1 Empty.dc.html`)
-- `/mobile`: StatGC mobile app on live data (from `StatGC Mobile.dc.html`): Home/Deals/Money/Brands with a bottom tab bar and centre + button, new-deal sheet, deal and brand pages, reminders, 4-step invoice with PDF, settings. Needs Google sign-in and uses the same account data as `/app` (see `src/screens/mobileLive.ts`). On a phone, `/app` opens `/mobile` (add `?desktop` to keep the desktop app)
+- `/mobile`: FlowGC mobile app on live data (from `FlowGC Mobile.dc.html`): Home/Deals/Money/Brands with a bottom tab bar and centre + button, new-deal sheet, deal and brand pages, reminders, 4-step invoice with PDF, settings. Needs Google sign-in and uses the same account data as `/app` (see `src/screens/mobileLive.ts`). On a phone, `/app` opens `/mobile` (add `?desktop` to keep the desktop app)
 - `/mobile/flow`: the website inside a phone frame, through login into the mobile dashboard
 - `/mobile/redesign`: the two mobile directions (1a final, 1b) side by side
 - `/invoice`: Invoice Generator: brand details, line items, deposit/discount, payment methods, PDF download and email to brand (from `Invoice Generator.dc.html`). Drafts save in localStorage
@@ -28,7 +28,7 @@ Other screens:
 - `/brand`: the brand's view
 - `/d/:token`, `/a/:token`: working brand links on the localStorage API (Tailwind styled)
 
-The main screens are `src/screens/StatGCWebsite.tsx`, `StatGCWebsiteLogin.tsx` and `StatGCApp.tsx`. The website pulls in `StatGCHero.tsx`, `StatGCZoomReveal.tsx` and `StatGCWaveText.tsx`. `<orbit-catch>` is a web component in `src/vendor/orbit-catch.js`, wrapped for React in `src/dc/OrbitCatch.tsx`.
+The main screens are `src/screens/FlowGCWebsite.tsx`, `FlowGCWebsiteLogin.tsx` and `FlowGCApp.tsx`. The website pulls in `FlowGCHero.tsx`, `FlowGCZoomReveal.tsx` and `FlowGCWaveText.tsx`. `<orbit-catch>` is a web component in `src/vendor/orbit-catch.js`, wrapped for React in `src/dc/OrbitCatch.tsx`.
 
 ## How the screens were made
 
