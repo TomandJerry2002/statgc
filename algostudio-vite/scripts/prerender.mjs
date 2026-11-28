@@ -76,7 +76,7 @@ const routes = [
   { path: '/', title: 'FlowGC · Brand deals and payments for creators', desc: DESC, body: homeBody, priority: '1.0',
     ld: [{ '@context': 'https://schema.org', '@graph': [
       // ── Organization: who makes FlowGC ──
-      { '@type': 'Organization', '@id': SITE + '/#organization', name: 'FlowGC', url: SITE + '/', logo: SITE + '/assets/logo-as.png' },
+      { '@type': 'Organization', '@id': SITE + '/#organization', name: 'FlowGC', url: SITE + '/', logo: SITE + '/assets/icon-512.png' },
       // ── WebSite: the public site ──
       { '@type': 'WebSite', '@id': SITE + '/#website', name: 'FlowGC', url: SITE + '/', inLanguage: 'en-IN', publisher: { '@id': SITE + '/#organization' } },
       // ── SoftwareApplication: the platform, and who it is for ──
@@ -126,7 +126,7 @@ const head = r => {
     `<meta property="og:title" content="${esc(r.title)}" />`,
     `<meta property="og:description" content="${esc(r.desc)}" />`,
     `<meta property="og:url" content="${url}" />`,
-    `<meta property="og:image" content="${SITE}/assets/logo-as.png" />`,
+    `<meta property="og:image" content="${SITE}/assets/icon-512.png" />`,
     `<meta property="og:locale" content="en_IN" />`,
     `<meta name="twitter:card" content="summary" />`,
     `<meta name="twitter:title" content="${esc(r.title)}" />`,
